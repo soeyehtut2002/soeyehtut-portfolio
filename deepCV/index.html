@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -107,7 +106,7 @@
       }
 
       .home-image img {
-        width: 35vw;
+        width: 34vw;
         max-width: 100%;
         animation: floatImage 4s ease-in-out infinite;
       }
@@ -837,6 +836,22 @@
           font-size: 3rem;
         }
       }
+
+      .home-image {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .home-image img {
+        width: 100%;
+        max-width: 550px; /* Keeps image from stretching too large */
+        height: auto;
+        object-fit: cover; /* Keeps proportions */
+
+        animation: floatImage 4s ease-in-out infinite;
+      }
     </style>
   </head>
   <body>
@@ -878,17 +893,14 @@
       </div>
 
       <div class="home-image">
-        <img
-          src="image/image/my_photo-removebg-preview.png"
-          alt="Profile Image"
-        />
+        <img src="image/image/erasebg-transformed.png" alt="Profile Image" />
       </div>
     </section>
 
     <!-- About Section -->
     <section class="about" id="about">
       <div class="about-image">
-        <img src="image/image/p2.png" alt="About Image" />
+        <img src="image/image/chaw chaw lay.png" alt="About Image" />
       </div>
 
       <div class="about-content">
