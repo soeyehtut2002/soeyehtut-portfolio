@@ -755,24 +755,55 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
   }
 
   try {
-    // 1. Try uploading to Catbox cloud storage
+    // 1. Upload to Catbox cloud storage using manually constructed multipart form data
     console.log("Uploading to Catbox cloud storage...");
-    const fd = new FormData();
-    fd.append('reqtype', 'fileupload');
-    const blob = new Blob([req.file.buffer], { type: req.file.mimetype });
-    fd.append('fileToUpload', blob, req.file.originalname);
+    const https = require('https');
+    const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
+    
+    // Construct the body parts
+    const header1 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="reqtype"\r\n\r\nfileupload\r\n`);
+    const header2 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="fileToUpload"; filename="${req.file.originalname}"\r\nContent-Type: ${req.file.mimetype}\r\n\r\n`);
+    const footer = Buffer.from(`\r\n--${boundary}--\r\n`);
+    
+    const bodyBuffer = Buffer.concat([
+      header1,
+      header2,
+      req.file.buffer,
+      footer
+    ]);
 
-    const catboxRes = await fetch('https://catbox.moe/user/api.php', {
+    const requestOptions = {
       method: 'POST',
-      body: fd
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': bodyBuffer.length,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    };
+
+    const catboxUrl = 'https://catbox.moe/user/api.php';
+    
+    const fileUrl = await new Promise((resolve, reject) => {
+      const catboxReq = https.request(catboxUrl, requestOptions, (catboxRes) => {
+        let responseData = '';
+        catboxRes.on('data', chunk => responseData += chunk);
+        catboxRes.on('end', () => {
+          if (catboxRes.statusCode === 200) {
+            resolve(responseData.trim());
+          } else {
+            reject(new Error(`Catbox returned status ${catboxRes.statusCode}: ${responseData}`));
+          }
+        });
+      });
+
+      catboxReq.on('error', reject);
+      catboxReq.write(bodyBuffer);
+      catboxReq.end();
     });
 
-    if (catboxRes.ok) {
-      const fileUrl = await catboxRes.text();
-      console.log("Uploaded successfully to Catbox:", fileUrl);
-      return res.json({ fileUrl });
-    }
-    throw new Error(`Catbox returned status ${catboxRes.status}`);
+    console.log("Uploaded successfully to Catbox:", fileUrl);
+    return res.json({ fileUrl });
+
   } catch (err) {
     console.warn("Cloud upload failed, attempting local fallback:", err.message);
 
