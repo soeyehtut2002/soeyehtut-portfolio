@@ -5,6 +5,10 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/",
+      "destination": "/deepCV/index.html"
+    },
+    {
       "source": "/:path*",
       "destination": "/deepCV/:path*"
     }
