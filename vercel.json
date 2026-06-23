@@ -1,47 +1,12 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "deepCV/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "deepCV/server.js"
+      "source": "/api/:path*",
+      "destination": "/api/index.js"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "deepCV/css/$1"
-    },
-    {
-      "src": "/js/(.*)",
-      "dest": "deepCV/js/$1"
-    },
-    {
-      "src": "/image/(.*)",
-      "dest": "deepCV/image/$1"
-    },
-    {
-      "src": "/cv/(.*)",
-      "dest": "deepCV/cv/$1"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "deepCV/uploads/$1"
-    },
-    {
-      "src": "/dashboard.html",
-      "dest": "deepCV/dashboard.html"
-    },
-    {
-      "src": "/index.html",
-      "dest": "deepCV/index.html"
-    },
-    {
-      "src": "/",
-      "dest": "deepCV/index.html"
+      "source": "/:path*",
+      "destination": "/deepCV/:path*"
     }
   ]
 }
