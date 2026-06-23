@@ -754,65 +754,108 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
+  const https = require('https');
+
   try {
-    // 1. Upload to Catbox cloud storage using manually constructed multipart form data
-    console.log("Uploading to Catbox cloud storage...");
-    const https = require('https');
-    const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
-    
-    // Construct the body parts
-    const header1 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="reqtype"\r\n\r\nfileupload\r\n`);
-    const header2 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="fileToUpload"; filename="${req.file.originalname}"\r\nContent-Type: ${req.file.mimetype}\r\n\r\n`);
-    const footer = Buffer.from(`\r\n--${boundary}--\r\n`);
-    
-    const bodyBuffer = Buffer.concat([
-      header1,
-      header2,
-      req.file.buffer,
-      footer
-    ]);
+    const imgbbKey = process.env.IMGBB_API_KEY;
 
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Content-Type': `multipart/form-data; boundary=${boundary}`,
-        'Content-Length': bodyBuffer.length,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    };
+    // 1. If ImgBB API key is provided, use ImgBB (recommended for Vercel and local)
+    if (imgbbKey) {
+      console.log("Uploading to ImgBB cloud storage...");
+      const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
+      const header = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="image"; filename="${req.file.originalname}"\r\nContent-Type: ${req.file.mimetype}\r\n\r\n`);
+      const footer = Buffer.from(`\r\n--${boundary}--\r\n`);
+      const bodyBuffer = Buffer.concat([header, req.file.buffer, footer]);
 
-    const catboxUrl = 'https://catbox.moe/user/api.php';
-    
-    const fileUrl = await new Promise((resolve, reject) => {
-      const catboxReq = https.request(catboxUrl, requestOptions, (catboxRes) => {
-        let responseData = '';
-        catboxRes.on('data', chunk => responseData += chunk);
-        catboxRes.on('end', () => {
-          if (catboxRes.statusCode === 200) {
-            resolve(responseData.trim());
-          } else {
-            reject(new Error(`Catbox returned status ${catboxRes.statusCode}: ${responseData}`));
-          }
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          'Content-Length': bodyBuffer.length
+        }
+      };
+
+      const fileUrl = await new Promise((resolve, reject) => {
+        const imgbbReq = https.request(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, requestOptions, (imgbbRes) => {
+          let responseData = '';
+          imgbbRes.on('data', chunk => responseData += chunk);
+          imgbbRes.on('end', () => {
+            if (imgbbRes.statusCode === 200) {
+              try {
+                const parsed = JSON.parse(responseData);
+                if (parsed.success && parsed.data && parsed.data.url) {
+                  resolve(parsed.data.url);
+                } else {
+                  reject(new Error(parsed.error ? parsed.error.message : "Unknown ImgBB error"));
+                }
+              } catch (e) {
+                reject(new Error("Failed to parse ImgBB response"));
+              }
+            } else {
+              reject(new Error(`ImgBB returned status ${imgbbRes.statusCode}`));
+            }
+          });
         });
+
+        imgbbReq.on('error', reject);
+        imgbbReq.write(bodyBuffer);
+        imgbbReq.end();
       });
 
-      catboxReq.on('error', reject);
-      catboxReq.write(bodyBuffer);
-      catboxReq.end();
-    });
-
-    console.log("Uploaded successfully to Catbox:", fileUrl);
-    return res.json({ fileUrl });
-
-  } catch (err) {
-    console.warn("Cloud upload failed, attempting local fallback:", err.message);
-
-    // 2. Local fallback
-    if (process.env.VERCEL) {
-      return res.status(500).json({ error: "Cloud upload failed on Vercel: " + err.message });
+      console.log("Uploaded successfully to ImgBB:", fileUrl);
+      return res.json({ fileUrl });
     }
 
+    // 2. If no ImgBB key is provided and we are on Vercel, ask user to configure it
+    if (process.env.VERCEL) {
+      return res.status(400).json({ 
+        error: "Image uploads are disabled on Vercel because the filesystem is read-only. To enable them, please sign up for a free key at https://imgbb.com/ and add the 'IMGBB_API_KEY' environment variable in your Vercel project settings." 
+      });
+    }
+
+    // 3. Local mode only: Try Catbox first
     try {
+      console.log("Uploading to Catbox cloud storage (local mode)...");
+      const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
+      const header1 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="reqtype"\r\n\r\nfileupload\r\n`);
+      const header2 = Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="fileToUpload"; filename="${req.file.originalname}"\r\nContent-Type: ${req.file.mimetype}\r\n\r\n`);
+      const footer = Buffer.from(`\r\n--${boundary}--\r\n`);
+      const bodyBuffer = Buffer.concat([header1, header2, req.file.buffer, footer]);
+
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          'Content-Length': bodyBuffer.length,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      };
+
+      const fileUrl = await new Promise((resolve, reject) => {
+        const catboxReq = https.request('https://catbox.moe/user/api.php', requestOptions, (catboxRes) => {
+          let responseData = '';
+          catboxRes.on('data', chunk => responseData += chunk);
+          catboxRes.on('end', () => {
+            if (catboxRes.statusCode === 200) {
+              resolve(responseData.trim());
+            } else {
+              reject(new Error(`Catbox returned status ${catboxRes.statusCode}`));
+            }
+          });
+        });
+
+        catboxReq.on('error', reject);
+        catboxReq.write(bodyBuffer);
+        catboxReq.end();
+      });
+
+      console.log("Uploaded successfully to Catbox:", fileUrl);
+      return res.json({ fileUrl });
+
+    } catch (catboxErr) {
+      console.warn("Catbox upload failed, saving locally:", catboxErr.message);
+
+      // 4. Local mode only fallback: Save file to local uploads directory
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const filename = uniqueSuffix + path.extname(req.file.originalname);
       const localPath = path.join(uploadsDir, filename);
@@ -820,9 +863,11 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
       const fileUrl = `/uploads/${filename}`;
       console.log("Saved file locally:", fileUrl);
       return res.json({ fileUrl });
-    } catch (localErr) {
-      return res.status(500).json({ error: "Failed to save file: " + localErr.message });
     }
+
+  } catch (err) {
+    console.error("Upload error:", err.message);
+    return res.status(500).json({ error: "Upload failed: " + err.message });
   }
 });
 
