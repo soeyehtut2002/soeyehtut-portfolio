@@ -1,0 +1,15 @@
+{
+  "name": "soeyehtut-portfolio-root",
+  "version": "1.0.0",
+  "description": "Root package for Vercel deployment of Soe Ye Htut Portfolio",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node deepCV/server.js",
+    "dev": "node deepCV/server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "pg": "^8.22.0"
+  }
+}
