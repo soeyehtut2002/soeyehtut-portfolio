@@ -894,4 +894,5 @@ if (!process.env.VERCEL) {
   initDB();
 }
 
+// Trigger redeployment after IMGBB_API_KEY environment variable configuration
 module.exports = app;
