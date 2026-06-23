@@ -2,18 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "deepCV/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server.js"
+      "dest": "deepCV/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "deepCV/$1"
     }
   ]
 }
