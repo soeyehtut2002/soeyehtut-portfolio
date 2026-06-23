@@ -1,0 +1,5 @@
+node_modules/
+deepCV/node_modules/
+*.log
+deepCV/uploads/*
+!deepCV/uploads/.gitkeep

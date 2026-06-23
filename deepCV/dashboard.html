@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Portfolio Manager</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-color: #1f242d;
+        --second-bg-color: #323946;
+        --text-color: #fff;
+        --main-color: #0ef;
+        --danger-color: #ff3333;
+        --success-color: #00cc66;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+        text-decoration: none;
+        outline: none;
+      }
+
+      body {
+        background: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+      }
+
+      /* Login Screen */
+      #login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .login-box {
+        background: var(--second-bg-color);
+        padding: 4rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 0 2rem rgba(0, 255, 239, 0.1);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .login-box h2 {
+        font-size: 2.8rem;
+        margin-bottom: 2rem;
+      }
+
+      .login-box h2 span {
+        color: var(--main-color);
+      }
+
+      .form-group {
+        margin-bottom: 2rem;
+        text-align: left;
+      }
+
+      .form-group label {
+        font-size: 1.4rem;
+        margin-bottom: 0.8rem;
+        display: block;
+        color: #ccc;
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 1.2rem;
+        background: var(--bg-color);
+        border: 0.1rem solid var(--second-bg-color);
+        border-radius: 0.8rem;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        transition: 0.3s;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        border-color: var(--main-color);
+        box-shadow: 0 0 1rem rgba(0, 255, 239, 0.3);
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 1.2rem 3rem;
+        background: var(--main-color);
+        color: var(--second-bg-color);
+        border-radius: 3rem;
+        font-size: 1.6rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+      }
+
+      .btn:hover {
+        box-shadow: 0 0 1.5rem var(--main-color);
+        transform: translateY(-2px);
+      }
+
+      .btn-danger {
+        background: var(--danger-color);
+        color: #fff;
+      }
+
+      .btn-danger:hover {
+        box-shadow: 0 0 1.5rem var(--danger-color);
+      }
+
+      /* Dashboard Layout */
+      #dashboard-container {
+        display: none;
+      }
+
+      header {
+        background: var(--second-bg-color);
+        padding: 2rem 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 0.1rem solid rgba(0, 255, 239, 0.1);
+      }
+
+      .logo {
+        font-size: 2.4rem;
+        font-weight: 700;
+      }
+
+      .logo span {
+        color: var(--main-color);
+      }
+
+      .logout-btn {
+        padding: 0.8rem 2rem;
+        background: transparent;
+        border: 0.2rem solid var(--main-color);
+        color: var(--main-color);
+        border-radius: 2rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+      }
+
+      .logout-btn:hover {
+        background: var(--main-color);
+        color: var(--second-bg-color);
+        box-shadow: 0 0 1rem var(--main-color);
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 4rem auto;
+        padding: 0 2rem;
+      }
+
+      /* Navigation Tabs */
+      .tabs {
+        display: flex;
+        border-bottom: 0.2rem solid var(--second-bg-color);
+        margin-bottom: 3rem;
+        gap: 2rem;
+        overflow-x: auto;
+      }
+
+      .tab {
+        padding: 1.5rem 2.5rem;
+        cursor: pointer;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #aaa;
+        border-bottom: 0.3rem solid transparent;
+        transition: 0.3s;
+      }
+
+      .tab:hover,
+      .tab.active {
+        color: var(--main-color);
+        border-bottom-color: var(--main-color);
+      }
+
+      .tab-panel {
+        display: none;
+      }
+
+      .tab-panel.active {
+        display: block;
+      }
+
+      /* Cards & Tables styling */
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .panel-header h3 {
+        font-size: 2.2rem;
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2.5rem;
+      }
+
+      .card {
+        background: var(--second-bg-color);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+      }
+
+      .card-body {
+        padding: 2rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-body h4 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .card-body p {
+        font-size: 1.4rem;
+        color: #ccc;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(0, 255, 239, 0.1);
+        color: var(--main-color);
+        border-radius: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        align-self: flex-start;
+      }
+
+      .card-actions {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .card-actions button {
+        flex: 1;
+        padding: 0.8rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+
+      .edit-btn {
+        background: var(--main-color);
+        color: var(--second-bg-color);
+      }
+
+      .delete-btn {
+        background: var(--danger-color);
+        color: #fff;
+      }
+
+      /* Tables styling */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--second-bg-color);
+        border-radius: 1rem;
+        overflow: hidden;
+      }
+
+      th, td {
+        padding: 1.5rem;
+        text-align: left;
+        font-size: 1.4rem;
+        border-bottom: 0.1rem solid rgba(255,255,255,0.05);
+      }
+
+      th {
+        background: rgba(0,0,0,0.2);
+        color: var(--main-color);
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background: rgba(255,255,255,0.02);
+      }
+
+      /* Modal styling */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+      }
+
+      .modal-content {
+        background: var(--second-bg-color);
+        padding: 3rem;
+        border-radius: 1.5rem;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .modal-header h3 {
+        font-size: 2rem;
+      }
+
+      .close-modal {
+        font-size: 2.4rem;
+        cursor: pointer;
+        color: #aaa;
+        transition: 0.2s;
+      }
+
+      .close-modal:hover {
+        color: var(--main-color);
+      }
+
+      /* Notifications/Toast */
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 1.5rem 3rem;
+        border-radius: 0.8rem;
+        color: white;
+        font-weight: 600;
+        z-index: 2000;
+        display: none;
+        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.3);
+      }
+
+      #toast.success {
+        background: var(--success-color);
+      }
+
+      #toast.error {
+        background: var(--danger-color);
+      }
+
+      /* Switch Toggle styling */
+      .switch-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2rem 2rem;
+        background: var(--bg-color);
+        border-radius: 0.8rem;
+        border: 1px solid var(--second-bg-color);
+      }
+      .switch-wrapper span {
+        font-size: 1.5rem;
+        font-weight: 500;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--second-bg-color);
+        border: 1px solid #555;
+        transition: .4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--main-color);
+      }
+      input:focus + .slider {
+        box-shadow: 0 0 1px var(--main-color);
+      }
+      input:checked + .slider:before {
+        transform: translateX(24px);
+        background-color: var(--second-bg-color);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toast Message -->
+    <div id="toast"></div>
+
+    <!-- Login Area -->
+    <div id="login-container">
+      <div class="login-box">
+        <h2>Dashboard <span>Login</span></h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="password">Enter Security Password</label>
+            <input type="password" id="password" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dashboard Content Area -->
+    <div id="dashboard-container">
+      <header>
+        <a href="/" class="logo">Portfolio <span>Admin.</span></a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </header>
+
+      <main>
+        <nav class="tabs">
+          <div class="tab active" onclick="switchTab('bio')"><i class="fas fa-user-circle"></i> Bio Settings</div>
+          <div class="tab" onclick="switchTab('projects')"><i class="fas fa-folder-open"></i> Projects</div>
+          <div class="tab" onclick="switchTab('reviews')"><i class="fas fa-star"></i> Reviews</div>
+          <div class="tab" onclick="switchTab('messages')"><i class="fas fa-envelope"></i> Messages Inbox</div>
+          <div class="tab" onclick="switchTab('sections')"><i class="fas fa-sliders-h"></i> Section Settings</div>
+          <div class="tab" onclick="switchTab('journey')"><i class="fas fa-graduation-cap"></i> Journey Timeline</div>
+        </nav>
+
+        <!-- Bio Settings Tab -->
+        <section id="bio-panel" class="tab-panel active">
+          <div class="panel-header">
+            <h3>Modify Biography</h3>
+          </div>
+          <form id="bio-form" style="background: var(--second-bg-color); padding: 3rem; border-radius: 1rem;">
+            <div class="form-group">
+              <label for="bio-name">Full Name</label>
+              <input type="text" id="bio-name" required />
+            </div>
+            <div class="form-group">
+              <label for="bio-title">Subtitle / Profession</label>
+              <input type="text" id="bio-title" required />
+            </div>
+            <div class="form-group">
+              <label for="bio-description">Bio Description</label>
+              <textarea id="bio-description" rows="5" required></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+              <div class="form-group">
+                <label>Landing Page Profile Photo</label>
+                <input type="file" id="bio-avatar-file" accept="image/*" onchange="handleImageUpload('bio-avatar-file', 'bio-avatar-url')" />
+                <input type="hidden" id="bio-avatar-url" />
+                <div style="margin-top: 1rem;">
+                  <img id="bio-avatar-preview" src="" alt="Avatar Preview" style="max-width: 120px; border-radius: 50%; display: none; border: 2px solid var(--main-color);" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>About Section Photo</label>
+                <input type="file" id="bio-about-file" accept="image/*" onchange="handleImageUpload('bio-about-file', 'bio-about-url')" />
+                <input type="hidden" id="bio-about-url" />
+                <div style="margin-top: 1rem;">
+                  <img id="bio-about-preview" src="" alt="About Preview" style="max-width: 120px; border-radius: 10px; display: none; border: 2px solid var(--main-color);" />
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn" style="width: auto; margin-top: 2rem;">Save Changes</button>
+          </form>
+        </section>
+
+        <!-- Projects Tab -->
+        <section id="projects-panel" class="tab-panel">
+          <div class="panel-header">
+            <h3>Manage Projects</h3>
+            <button class="btn" onclick="openProjectModal()" style="width: auto;"><i class="fas fa-plus"></i> Add Project</button>
+          </div>
+          <div class="grid-container" id="projects-grid">
+            <!-- Dynamic Projects -->
+          </div>
+        </section>
+
+        <!-- Reviews Tab -->
+        <section id="reviews-panel" class="tab-panel">
+          <div class="panel-header">
+            <h3>Moderate Reviews</h3>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Reviewer</th>
+                  <th>Rating</th>
+                  <th>Comment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reviews-table-body">
+                <!-- Dynamic Reviews -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Messages Tab -->
+        <section id="messages-panel" class="tab-panel">
+          <div class="panel-header">
+            <h3>Contact Messages</h3>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sender Info</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="messages-table-body">
+                <!-- Dynamic Messages -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Section Settings Tab -->
+        <section id="sections-panel" class="tab-panel">
+          <div class="panel-header">
+            <h3>Manage Section Visibility</h3>
+          </div>
+          <form id="sections-form" style="background: var(--second-bg-color); padding: 3rem; border-radius: 1rem;">
+            <div id="sections-list" style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+              <!-- Dynamic checkboxes loaded here -->
+            </div>
+            <button type="submit" class="btn" style="width: auto;">Save Visibility Changes</button>
+          </form>
+        </section>
+
+        <!-- Journey Timeline Tab -->
+        <section id="journey-panel" class="tab-panel">
+          <div class="panel-header">
+            <h3>Manage Journey Timeline</h3>
+            <button class="btn" onclick="openJourneyModal()" style="width: auto;"><i class="fas fa-plus"></i> Add Item</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Title / Role</th>
+                  <th>Description</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="journey-table-body">
+                <!-- Dynamic Journey Items -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Project Edit/Add Modal -->
+    <div id="project-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">Add Project</h3>
+          <span class="close-modal" onclick="closeProjectModal()">&times;</span>
+        </div>
+        <form id="project-form">
+          <input type="hidden" id="project-id" />
+          <div class="form-group">
+            <label for="project-title-input">Project Title</label>
+            <input type="text" id="project-title-input" required />
+          </div>
+          <div class="form-group">
+            <label for="project-desc-input">Description</label>
+            <textarea id="project-desc-input" rows="4" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="project-link-input">Link / URL</label>
+            <input type="text" id="project-link-input" required />
+          </div>
+          <div class="form-group">
+            <label for="project-type-input">Project Type</label>
+            <select id="project-type-input" required>
+              <option value="frontend">Frontend Project</option>
+              <option value="ui_ux">UI / UX Project</option>
+              <option value="fullstack">Fullstack Project</option>
+              <option value="mobile">Mobile App Project</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Project Thumbnail</label>
+            <input type="file" id="project-img-file" accept="image/*" onchange="handleImageUpload('project-img-file', 'project-img-url')" />
+            <input type="hidden" id="project-img-url" required />
+            <div style="margin-top: 1rem;">
+              <img id="project-img-preview" src="" alt="Thumbnail Preview" style="max-width: 100%; max-height: 150px; display: none; border-radius: 0.5rem;" />
+            </div>
+          </div>
+          <button type="submit" class="btn">Save Project</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Journey Edit/Add Modal -->
+    <div id="journey-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="journey-modal-title">Add Journey Item</h3>
+          <span class="close-modal" onclick="closeJourneyModal()">&times;</span>
+        </div>
+        <form id="journey-form">
+          <input type="hidden" id="journey-id" />
+          <div class="form-group">
+            <label for="journey-title-input">Title / Role</label>
+            <input type="text" id="journey-title-input" required placeholder="e.g. B.S. in Computer Science" />
+          </div>
+          <div class="form-group">
+            <label for="journey-period-input">Time Period</label>
+            <input type="text" id="journey-period-input" required placeholder="e.g. 2021 - 2024" />
+          </div>
+          <div class="form-group">
+            <label for="journey-desc-input">Description</label>
+            <textarea id="journey-desc-input" rows="4" required placeholder="e.g. Studied software development..."></textarea>
+          </div>
+          <button type="submit" class="btn">Save Item</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // State Management
+      let token = localStorage.getItem('admin_token') || '';
+
+      // Initialize App
+      window.onload = () => {
+        if (token) {
+          showDashboard();
+        } else {
+          showLogin();
+        }
+      };
+
+      // Toast Notifications
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `success`;
+        if (type === 'error') toast.className = 'error';
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 3000);
+      }
+
+      // Show/Hide Screens
+      function showLogin() {
+        document.getElementById('login-container').style.display = 'flex';
+        document.getElementById('dashboard-container').style.display = 'none';
+      }
+
+      function showDashboard() {
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('dashboard-container').style.display = 'block';
+        // Load Bio details immediately
+        loadBio();
+        loadProjects();
+        loadReviews();
+        loadMessages();
+        loadSections();
+        loadJourney();
+      }
+
+      // Login Handler
+      document.getElementById('login-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const password = document.getElementById('password').value;
+        try {
+          const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            token = data.token;
+            localStorage.setItem('admin_token', token);
+            showToast('Login successful!');
+            showDashboard();
+          } else {
+            showToast(data.error || 'Login failed', 'error');
+          }
+        } catch (err) {
+          showToast('Network error', 'error');
+        }
+      };
+
+      // Logout Handler
+      function logout() {
+        token = '';
+        localStorage.removeItem('admin_token');
+        showToast('Logged out successfully.');
+        showLogin();
+      }
+
+      // Tab Switcher
+      function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById(`${tabId}-panel`).classList.add('active');
+      }
+
+      // File Uploader
+      async function handleImageUpload(fileInputId, hiddenInputId) {
+        const fileInput = document.getElementById(fileInputId);
+        if (fileInput.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        try {
+          const res = await fetch('/api/admin/upload', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+          });
+          const data = await res.json();
+          if (res.ok) {
+            document.getElementById(hiddenInputId).value = data.fileUrl;
+            // Show preview
+            let previewId;
+            if (fileInputId === 'bio-avatar-file') previewId = 'bio-avatar-preview';
+            else if (fileInputId === 'bio-about-file') previewId = 'bio-about-preview';
+            else previewId = 'project-img-preview';
+            
+            const previewImg = document.getElementById(previewId);
+            previewImg.src = data.fileUrl;
+            previewImg.style.display = 'block';
+            showToast('Image uploaded successfully!');
+          } else {
+            showToast(data.error || 'Upload failed', 'error');
+          }
+        } catch (err) {
+          showToast('Image upload failed', 'error');
+        }
+      }
+
+      // 1. Bio Operations
+      async function loadBio() {
+        try {
+          const res = await fetch('/api/bio');
+          if (res.ok) {
+            const bio = await res.json();
+            document.getElementById('bio-name').value = bio.name || '';
+            document.getElementById('bio-title').value = bio.title || '';
+            document.getElementById('bio-description').value = bio.description || '';
+            document.getElementById('bio-avatar-url').value = bio.avatar_url || '';
+            document.getElementById('bio-about-url').value = bio.about_image_url || '';
+            
+            if (bio.avatar_url) {
+              const preview = document.getElementById('bio-avatar-preview');
+              preview.src = bio.avatar_url;
+              preview.style.display = 'block';
+            }
+            if (bio.about_image_url) {
+              const previewAbout = document.getElementById('bio-about-preview');
+              previewAbout.src = bio.about_image_url;
+              previewAbout.style.display = 'block';
+            }
+          }
+        } catch (err) {
+          showToast('Failed to load Bio', 'error');
+        }
+      }
+
+      document.getElementById('bio-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+          name: document.getElementById('bio-name').value,
+          title: document.getElementById('bio-title').value,
+          description: document.getElementById('bio-description').value,
+          avatar_url: document.getElementById('bio-avatar-url').value,
+          about_image_url: document.getElementById('bio-about-url').value
+        };
+
+        try {
+          const res = await fetch('/api/admin/bio', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            showToast('Bio updated successfully!');
+          } else {
+            const data = await res.json();
+            showToast(data.error || 'Bio update failed', 'error');
+          }
+        } catch (err) {
+          showToast('Network error updating bio', 'error');
+        }
+      };
+
+      // 2. Project Operations
+      async function loadProjects() {
+        try {
+          const res = await fetch('/api/projects');
+          if (res.ok) {
+            const projects = await res.json();
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = '';
+            
+            const typeLabels = {
+              'frontend': 'Frontend',
+              'ui_ux': 'UI/UX',
+              'fullstack': 'Fullstack',
+              'mobile': 'Mobile App'
+            };
+            
+            projects.forEach(p => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              const label = typeLabels[p.type] || p.type;
+              card.innerHTML = `
+                <img src="${p.image_url || 'image/image/home-img.png'}" alt="${p.title}" />
+                <div class="card-body">
+                  <span class="badge">${label}</span>
+                  <h4>${p.title}</h4>
+                  <p>${p.description}</p>
+                  <div class="card-actions">
+                    <button class="edit-btn" onclick="editProject(${JSON.stringify(p).replace(/"/g, '&quot;')})"><i class="fas fa-edit"></i> Edit</button>
+                    <button class="delete-btn" onclick="deleteProject(${p.id})"><i class="fas fa-trash-alt"></i> Delete</button>
+                  </div>
+                </div>
+              `;
+              grid.appendChild(card);
+            });
+          }
+        } catch (err) {
+          showToast('Failed to load projects', 'error');
+        }
+      }
+
+      function openProjectModal() {
+        document.getElementById('modal-title').textContent = 'Add Project';
+        document.getElementById('project-id').value = '';
+        document.getElementById('project-form').reset();
+        document.getElementById('project-img-url').value = '';
+        document.getElementById('project-img-preview').style.display = 'none';
+        document.getElementById('project-modal').style.display = 'flex';
+      }
+
+      function closeProjectModal() {
+        document.getElementById('project-modal').style.display = 'none';
+      }
+
+      function editProject(project) {
+        document.getElementById('modal-title').textContent = 'Edit Project';
+        document.getElementById('project-id').value = project.id;
+        document.getElementById('project-title-input').value = project.title;
+        document.getElementById('project-desc-input').value = project.description;
+        document.getElementById('project-link-input').value = project.project_url;
+        document.getElementById('project-type-input').value = project.type;
+        document.getElementById('project-img-url').value = project.image_url;
+
+        const preview = document.getElementById('project-img-preview');
+        preview.src = project.image_url;
+        preview.style.display = 'block';
+
+        document.getElementById('project-modal').style.display = 'flex';
+      }
+
+      document.getElementById('project-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('project-id').value;
+        const payload = {
+          title: document.getElementById('project-title-input').value,
+          description: document.getElementById('project-desc-input').value,
+          project_url: document.getElementById('project-link-input').value,
+          type: document.getElementById('project-type-input').value,
+          image_url: document.getElementById('project-img-url').value
+        };
+
+        const url = id ? `/api/admin/projects/${id}` : '/api/admin/projects';
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+          const res = await fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            showToast(id ? 'Project updated successfully' : 'Project added successfully');
+            closeProjectModal();
+            loadProjects();
+          } else {
+            const data = await res.json();
+            showToast(data.error || 'Failed to save project', 'error');
+          }
+        } catch (err) {
+          showToast('Network error saving project', 'error');
+        }
+      };
+
+      async function deleteProject(id) {
+        if (!confirm('Are you sure you want to delete this project?')) return;
+        try {
+          const res = await fetch(`/api/admin/projects/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            showToast('Project deleted successfully');
+            loadProjects();
+          } else {
+            showToast('Failed to delete project', 'error');
+          }
+        } catch (err) {
+          showToast('Network error deleting project', 'error');
+        }
+      }
+
+      // 3. Reviews Operations
+      async function loadReviews() {
+        try {
+          const res = await fetch('/api/admin/reviews', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const reviews = await res.json();
+            const tbody = document.getElementById('reviews-table-body');
+            tbody.innerHTML = '';
+            reviews.forEach(r => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${r.project_title}</strong></td>
+                <td>${r.reviewer_name}</td>
+                <td><i class="fas fa-star" style="color: gold;"></i> ${r.rating}/5</td>
+                <td>${r.comment}</td>
+                <td>
+                  <button class="btn btn-danger" onclick="deleteReview(${r.id})" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1.2rem;">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        } catch (err) {
+          showToast('Failed to load reviews', 'error');
+        }
+      }
+
+      async function deleteReview(id) {
+        if (!confirm('Are you sure you want to delete this review?')) return;
+        try {
+          const res = await fetch(`/api/admin/reviews/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            showToast('Review deleted successfully');
+            loadReviews();
+          } else {
+            showToast('Failed to delete review', 'error');
+          }
+        } catch (err) {
+          showToast('Network error deleting review', 'error');
+        }
+      }
+
+      // 4. Messages Inbox Operations
+      async function loadMessages() {
+        try {
+          const res = await fetch('/api/admin/messages', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const messages = await res.json();
+            const tbody = document.getElementById('messages-table-body');
+            tbody.innerHTML = '';
+            messages.forEach(m => {
+              const dateStr = new Date(m.created_at).toLocaleString();
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>
+                  <strong>${m.name}</strong><br/>
+                  <small>${m.email}</small><br/>
+                  <small>${m.phone || 'No phone'}</small>
+                </td>
+                <td><strong>${m.subject}</strong></td>
+                <td>${m.message}</td>
+                <td><small>${dateStr}</small></td>
+                <td>
+                  <button class="btn btn-danger" onclick="deleteMessage(${m.id})" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1.2rem;">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        } catch (err) {
+          showToast('Failed to load messages', 'error');
+        }
+      }
+
+      async function deleteMessage(id) {
+        if (!confirm('Are you sure you want to delete this message?')) return;
+        try {
+          const res = await fetch(`/api/admin/messages/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            showToast('Message deleted successfully');
+            loadMessages();
+          } else {
+            showToast('Failed to delete message', 'error');
+          }
+        } catch (err) {
+          showToast('Network error deleting message', 'error');
+        }
+      }
+
+      // 5. Section Settings Operations
+      async function loadSections() {
+        try {
+          const res = await fetch('/api/sections');
+          if (res.ok) {
+            const sections = await res.json();
+            const container = document.getElementById('sections-list');
+            container.innerHTML = '';
+            sections.forEach(sec => {
+              const div = document.createElement('div');
+              div.className = 'switch-wrapper';
+              div.innerHTML = `
+                <span>${sec.title}</span>
+                <label class="switch">
+                  <input type="checkbox" class="section-toggle-input" data-id="${sec.section_id}" ${sec.is_visible ? 'checked' : ''} />
+                  <span class="slider"></span>
+                </label>
+              `;
+              container.appendChild(div);
+            });
+          }
+        } catch (err) {
+          showToast('Failed to load section settings', 'error');
+        }
+      }
+
+      document.getElementById('sections-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const toggles = document.querySelectorAll('.section-toggle-input');
+        const sections = Array.from(toggles).map(input => ({
+          section_id: input.getAttribute('data-id'),
+          is_visible: input.checked
+        }));
+
+        try {
+          const res = await fetch('/api/admin/sections', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ sections })
+          });
+          if (res.ok) {
+            showToast('Section visibility updated successfully!');
+            loadSections();
+          } else {
+            const data = await res.json();
+            showToast(data.error || 'Failed to update sections', 'error');
+          }
+        } catch (err) {
+          showToast('Network error saving section settings', 'error');
+        }
+      };
+
+      // 6. Journey Timeline Operations
+      async function loadJourney() {
+        try {
+          const res = await fetch('/api/journey');
+          if (res.ok) {
+            const journey = await res.json();
+            const tbody = document.getElementById('journey-table-body');
+            tbody.innerHTML = '';
+            journey.forEach(item => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td><strong>${item.time_period}</strong></td>
+                <td><strong>${item.title}</strong></td>
+                <td>${item.description}</td>
+                <td>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn edit-btn" onclick="editJourney(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1.2rem;">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteJourney(${item.id})" style="padding: 0.6rem 1.2rem; width: auto; font-size: 1.2rem;">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </div>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+          }
+        } catch (err) {
+          showToast('Failed to load journey timeline', 'error');
+        }
+      }
+
+      function openJourneyModal() {
+        document.getElementById('journey-modal-title').textContent = 'Add Journey Item';
+        document.getElementById('journey-id').value = '';
+        document.getElementById('journey-form').reset();
+        document.getElementById('journey-modal').style.display = 'flex';
+      }
+
+      function closeJourneyModal() {
+        document.getElementById('journey-modal').style.display = 'none';
+      }
+
+      function editJourney(item) {
+        document.getElementById('journey-modal-title').textContent = 'Edit Journey Item';
+        document.getElementById('journey-id').value = item.id;
+        document.getElementById('journey-title-input').value = item.title;
+        document.getElementById('journey-period-input').value = item.time_period;
+        document.getElementById('journey-desc-input').value = item.description;
+        document.getElementById('journey-modal').style.display = 'flex';
+      }
+
+      document.getElementById('journey-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('journey-id').value;
+        const payload = {
+          title: document.getElementById('journey-title-input').value,
+          time_period: document.getElementById('journey-period-input').value,
+          description: document.getElementById('journey-desc-input').value
+        };
+
+        const url = id ? `/api/admin/journey/${id}` : '/api/admin/journey';
+        const method = id ? 'PUT' : 'POST';
+
+        try {
+          const res = await fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            showToast(id ? 'Journey item updated successfully' : 'Journey item added successfully');
+            closeJourneyModal();
+            loadJourney();
+          } else {
+            const data = await res.json();
+            showToast(data.error || 'Failed to save journey item', 'error');
+          }
+        } catch (err) {
+          showToast('Network error saving journey item', 'error');
+        }
+      };
+
+      async function deleteJourney(id) {
+        if (!confirm('Are you sure you want to delete this journey item?')) return;
+        try {
+          const res = await fetch(`/api/admin/journey/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            showToast('Journey item deleted successfully');
+            loadJourney();
+          } else {
+            showToast('Failed to delete journey item', 'error');
+          }
+        } catch (err) {
+          showToast('Network error deleting journey item', 'error');
+        }
+      }
+    </script>
+  </body>
+</html>
