@@ -275,7 +275,8 @@ const authenticateAdmin = (req, res, next) => {
 app.get('/api/debug-env', (req, res) => {
   res.json({
     hasImgbbKey: !!process.env.IMGBB_API_KEY,
-    keys: Object.keys(process.env).filter(k => k.includes('KEY') || k.includes('URL') || k.includes('POSTGRES'))
+    hasPostgresUrl: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL),
+    envKeys: Object.keys(process.env)
   });
 });
 
