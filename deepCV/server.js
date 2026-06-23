@@ -40,6 +40,236 @@ const dbConfig = {
 
 let pool;
 
+const mockDb = {
+  bio: [
+    {
+      id: 1,
+      name: "Soe Ye Htut",
+      title: "Frontend Developer",
+      description: "Motivated junior developer with a strong foundation seeking to contribute to a dynamic team. Eager to learn, enhance problem-solving skills, and work on innovative projects in a collaborative environment.",
+      avatar_url: "image/image/home-img.png",
+      about_image_url: "image/image/cvimage.png"
+    }
+  ],
+  projects: [
+    {
+      id: 1,
+      title: "Fitness Website",
+      description: "This website showcases my expertise in web design, blending user experience principles with aesthetic detail. It's crafted meticulously to meet functional needs while providing an engaging visual journey.",
+      image_url: "image/image/dobugym.png",
+      project_url: "https://dobu-iota.vercel.app/About.html",
+      type: "frontend"
+    },
+    {
+      id: 2,
+      title: "Food Website",
+      description: "This website showcases innovation and creativity with a user-centric design, responsive layout, and minimalist approach for engaging visitors.",
+      image_url: "image/image/mealonwheel.png",
+      project_url: "#",
+      type: "frontend"
+    },
+    {
+      id: 3,
+      title: "Car Sale Portal",
+      description: "This used car sales portal streamlines the buying and selling of pre-owned vehicles. It features user-friendly functions like test drives, bidding, and comprehensive user and admin management.",
+      image_url: "image/image/usedcarportal.png",
+      project_url: "#",
+      type: "frontend"
+    }
+  ],
+  section_settings: [
+    { id: 1, section_id: 'home', title: 'Home Banner', is_visible: true },
+    { id: 2, section_id: 'about', title: 'About Me', is_visible: true },
+    { id: 3, section_id: 'services', title: 'My Services', is_visible: true },
+    { id: 4, section_id: 'experience', title: 'My Journey (Timeline)', is_visible: true },
+    { id: 5, section_id: 'skills', title: 'Technical Skills', is_visible: true },
+    { id: 6, section_id: 'soft-skills', title: 'Soft Skills', is_visible: true },
+    { id: 7, section_id: 'portfolio', title: 'Latest Projects', is_visible: true },
+    { id: 8, section_id: 'contact', title: 'Contact Me', is_visible: true }
+  ],
+  journey: [
+    {
+      id: 1,
+      title: "Freelance Web Developer",
+      description: "Developing frontend solutions, responsive web interfaces, and single-page apps for local and remote clients.",
+      time_period: "2024 - Present"
+    },
+    {
+      id: 2,
+      title: "B.S. in Computer Science",
+      description: "Studied software engineering principles, algorithms, database management systems, and web application architectures.",
+      time_period: "2021 - 2024"
+    }
+  ],
+  reviews: [],
+  messages: []
+};
+
+let mockIdCounter = 100;
+
+const mockPool = {
+  query: async (sql, params = []) => {
+    const q = sql.trim().toLowerCase();
+    
+    // DDL Statements - ignore
+    if (q.startsWith("create table") || q.startsWith("alter table")) {
+      return { rows: [], rowCount: 0 };
+    }
+    
+    // SELECT COUNT(*)
+    if (q.startsWith("select count(*)")) {
+      let count = 0;
+      if (q.includes("from bio")) count = mockDb.bio.length;
+      else if (q.includes("from projects")) count = mockDb.projects.length;
+      else if (q.includes("from section_settings")) count = mockDb.section_settings.length;
+      else if (q.includes("from journey")) count = mockDb.journey.length;
+      return { rows: [{ count: count.toString() }], rowCount: 1 };
+    }
+    
+    // SELECT ALL
+    if (q.startsWith("select *") || q.startsWith("select r.*")) {
+      if (q.includes("from bio")) {
+        return { rows: mockDb.bio, rowCount: mockDb.bio.length };
+      }
+      if (q.includes("from section_settings")) {
+        return { rows: mockDb.section_settings, rowCount: mockDb.section_settings.length };
+      }
+      if (q.includes("from projects")) {
+        return { rows: mockDb.projects, rowCount: mockDb.projects.length };
+      }
+      if (q.includes("from journey")) {
+        return { rows: mockDb.journey, rowCount: mockDb.journey.length };
+      }
+      if (q.includes("from messages")) {
+        return { rows: mockDb.messages, rowCount: mockDb.messages.length };
+      }
+      if (q.includes("from reviews")) {
+        if (q.includes("project_id=")) {
+          const projectId = params[0];
+          const filtered = mockDb.reviews.filter(r => r.project_id === Number(projectId));
+          return { rows: filtered, rowCount: filtered.length };
+        }
+        if (q.includes("join projects")) {
+          const joined = mockDb.reviews.map(r => {
+            const p = mockDb.projects.find(proj => proj.id === r.project_id);
+            return { ...r, project_title: p ? p.title : "Unknown Project" };
+          });
+          return { rows: joined, rowCount: joined.length };
+        }
+        return { rows: mockDb.reviews, rowCount: mockDb.reviews.length };
+      }
+    }
+    
+    // INSERT INTO
+    if (q.startsWith("insert into")) {
+      mockIdCounter++;
+      let newRow = { id: mockIdCounter };
+      
+      if (q.includes("insert into bio")) {
+        newRow = { id: mockIdCounter, name: params[0], title: params[1], description: params[2], avatar_url: params[3], about_image_url: params[4] };
+        mockDb.bio.push(newRow);
+      }
+      else if (q.includes("insert into projects")) {
+        newRow = { id: mockIdCounter, title: params[0], description: params[1], image_url: params[2], project_url: params[3], type: params[4] };
+        mockDb.projects.push(newRow);
+      }
+      else if (q.includes("insert into section_settings")) {
+        newRow = { id: mockIdCounter, section_id: params[0], title: params[1], is_visible: params[2] };
+        mockDb.section_settings.push(newRow);
+      }
+      else if (q.includes("insert into journey")) {
+        newRow = { id: mockIdCounter, title: params[0], description: params[1], time_period: params[2], created_at: new Date() };
+        mockDb.journey.push(newRow);
+      }
+      else if (q.includes("insert into reviews")) {
+        newRow = { id: mockIdCounter, project_id: Number(params[0]), reviewer_name: params[1], rating: Number(params[2]), comment: params[3], created_at: new Date() };
+        mockDb.reviews.push(newRow);
+      }
+      else if (q.includes("insert into messages")) {
+        newRow = { id: mockIdCounter, name: params[0], email: params[1], phone: params[2], subject: params[3], message: params[4], created_at: new Date() };
+        mockDb.messages.push(newRow);
+      }
+      
+      return { rows: [newRow], rowCount: 1 };
+    }
+    
+    // UPDATE
+    if (q.startsWith("update")) {
+      if (q.includes("update bio")) {
+        const row = mockDb.bio.find(b => b.id === Number(params[5])) || mockDb.bio[0] || {};
+        row.name = params[0];
+        row.title = params[1];
+        row.description = params[2];
+        row.avatar_url = params[3];
+        row.about_image_url = params[4];
+        return { rows: [row], rowCount: 1 };
+      }
+      if (q.includes("update section_settings")) {
+        const row = mockDb.section_settings.find(s => s.section_id === params[1]);
+        if (row) {
+          row.is_visible = params[0] === true || params[0] === 'true';
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
+      if (q.includes("update projects")) {
+        const row = mockDb.projects.find(p => p.id === Number(params[5]));
+        if (row) {
+          row.title = params[0];
+          row.description = params[1];
+          row.image_url = params[2];
+          row.project_url = params[3];
+          row.type = params[4];
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
+      if (q.includes("update journey")) {
+        const row = mockDb.journey.find(j => j.id === Number(params[3]));
+        if (row) {
+          row.title = params[0];
+          row.description = params[1];
+          row.time_period = params[2];
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
+    }
+    
+    // DELETE
+    if (q.startsWith("delete from")) {
+      let deletedRow = null;
+      const targetId = Number(params[0]);
+      
+      if (q.includes("from projects")) {
+        const index = mockDb.projects.findIndex(p => p.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.projects.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from journey")) {
+        const index = mockDb.journey.findIndex(j => j.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.journey.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from reviews")) {
+        const index = mockDb.reviews.findIndex(r => r.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.reviews.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from messages")) {
+        const index = mockDb.messages.findIndex(m => m.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.messages.splice(index, 1)[0];
+        }
+      }
+      
+      return { rows: deletedRow ? [deletedRow] : [], rowCount: deletedRow ? 1 : 0 };
+    }
+    
+    return { rows: [], rowCount: 0 };
+  }
+};
+
 // Authentication Middleware
 const authenticateAdmin = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -60,26 +290,42 @@ async function initDB() {
       connectionString: connectionString,
       ssl: { rejectUnauthorized: false }
     });
-  } else {
-    // Step 1: Connect to default 'postgres' database to ensure 'portfolio_db' exists locally
-    const client = new Client({ ...dbConfig, database: 'postgres' });
     try {
+      await pool.query("SELECT 1");
+      console.log("Cloud database connected successfully.");
+    } catch (err) {
+      console.warn("Cloud database connection failed. Falling back to in-memory mock database:", err.message);
+      pool = mockPool;
+      return;
+    }
+  } else {
+    if (process.env.VERCEL) {
+      console.warn("No DATABASE_URL configured on Vercel. Running in-memory mock mode.");
+      pool = mockPool;
+      return;
+    }
+
+    try {
+      // Step 1: Connect to default 'postgres' database to ensure 'portfolio_db' exists locally
+      const client = new Client({ ...dbConfig, database: 'postgres' });
       await client.connect();
       const res = await client.query("SELECT 1 FROM pg_database WHERE datname = 'portfolio_db'");
       if (res.rowCount === 0) {
         console.log("Database 'portfolio_db' does not exist. Creating it...");
-        // CREATE DATABASE cannot run inside a transaction block, so we run it directly
         await client.query("CREATE DATABASE portfolio_db");
         console.log("Database 'portfolio_db' created successfully.");
       }
-    } catch (err) {
-      console.error("Error checking/creating database locally:", err.message);
-    } finally {
       await client.end();
-    }
 
-    // Step 2: Initialize Connection Pool to local 'portfolio_db'
-    pool = new Pool({ ...dbConfig, database: 'portfolio_db' });
+      // Step 2: Initialize Connection Pool to local 'portfolio_db'
+      pool = new Pool({ ...dbConfig, database: 'portfolio_db' });
+      await pool.query("SELECT 1");
+      console.log("Local database connected successfully.");
+    } catch (err) {
+      console.warn("Local database connection failed. Falling back to in-memory mock database:", err.message);
+      pool = mockPool;
+      return;
+    }
   }
 
   // Step 3: Create Tables
