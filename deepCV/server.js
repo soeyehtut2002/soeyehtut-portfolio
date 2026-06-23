@@ -276,6 +276,8 @@ app.get('/api/debug-env', (req, res) => {
   res.json({
     hasImgbbKey: !!process.env.IMGBB_API_KEY,
     hasPostgresUrl: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL),
+    projectName: process.env.VERCEL_PROJECT_NAME,
+    vercelEnv: process.env.VERCEL_ENV,
     envKeys: Object.keys(process.env)
   });
 });
