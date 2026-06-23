@@ -19,15 +19,7 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Multer setup for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Database Connection Config
@@ -757,12 +749,50 @@ app.delete('/api/admin/journey/:id', authenticateAdmin, async (req, res) => {
 });
 
 // 6. Image Upload Endpoint
-app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), (req, res) => {
+app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
-  const fileUrl = `/uploads/${req.file.filename}`;
-  res.json({ fileUrl });
+
+  try {
+    // 1. Try uploading to Catbox cloud storage
+    console.log("Uploading to Catbox cloud storage...");
+    const fd = new FormData();
+    fd.append('reqtype', 'fileupload');
+    const blob = new Blob([req.file.buffer], { type: req.file.mimetype });
+    fd.append('fileToUpload', blob, req.file.originalname);
+
+    const catboxRes = await fetch('https://catbox.moe/user/api.php', {
+      method: 'POST',
+      body: fd
+    });
+
+    if (catboxRes.ok) {
+      const fileUrl = await catboxRes.text();
+      console.log("Uploaded successfully to Catbox:", fileUrl);
+      return res.json({ fileUrl });
+    }
+    throw new Error(`Catbox returned status ${catboxRes.status}`);
+  } catch (err) {
+    console.warn("Cloud upload failed, attempting local fallback:", err.message);
+
+    // 2. Local fallback
+    if (process.env.VERCEL) {
+      return res.status(500).json({ error: "Cloud upload failed on Vercel: " + err.message });
+    }
+
+    try {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const filename = uniqueSuffix + path.extname(req.file.originalname);
+      const localPath = path.join(uploadsDir, filename);
+      fs.writeFileSync(localPath, req.file.buffer);
+      const fileUrl = `/uploads/${filename}`;
+      console.log("Saved file locally:", fileUrl);
+      return res.json({ fileUrl });
+    } catch (localErr) {
+      return res.status(500).json({ error: "Failed to save file: " + localErr.message });
+    }
+  }
 });
 
 // Serve uploads folder statically
