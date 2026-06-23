@@ -504,7 +504,10 @@
               <div class="form-group">
                 <label>Landing Page Profile Photo</label>
                 <input type="file" id="bio-avatar-file" accept="image/*" onchange="handleImageUpload('bio-avatar-file', 'bio-avatar-url')" />
-                <input type="hidden" id="bio-avatar-url" />
+                <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                  <span style="font-size: 1.2rem; color: #aaa;">OR URL:</span>
+                  <input type="text" id="bio-avatar-url" placeholder="https://example.com/avatar.jpg" style="padding: 0.6rem; font-size: 1.3rem;" oninput="document.getElementById('bio-avatar-preview').src = this.value; document.getElementById('bio-avatar-preview').style.display = this.value ? 'block' : 'none';" />
+                </div>
                 <div style="margin-top: 1rem;">
                   <img id="bio-avatar-preview" src="" alt="Avatar Preview" style="max-width: 120px; border-radius: 50%; display: none; border: 2px solid var(--main-color);" />
                 </div>
@@ -512,7 +515,10 @@
               <div class="form-group">
                 <label>About Section Photo</label>
                 <input type="file" id="bio-about-file" accept="image/*" onchange="handleImageUpload('bio-about-file', 'bio-about-url')" />
-                <input type="hidden" id="bio-about-url" />
+                <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                  <span style="font-size: 1.2rem; color: #aaa;">OR URL:</span>
+                  <input type="text" id="bio-about-url" placeholder="https://example.com/about.jpg" style="padding: 0.6rem; font-size: 1.3rem;" oninput="document.getElementById('bio-about-preview').src = this.value; document.getElementById('bio-about-preview').style.display = this.value ? 'block' : 'none';" />
+                </div>
                 <div style="margin-top: 1rem;">
                   <img id="bio-about-preview" src="" alt="About Preview" style="max-width: 120px; border-radius: 10px; display: none; border: 2px solid var(--main-color);" />
                 </div>
@@ -650,7 +656,10 @@
           <div class="form-group">
             <label>Project Thumbnail</label>
             <input type="file" id="project-img-file" accept="image/*" onchange="handleImageUpload('project-img-file', 'project-img-url')" />
-            <input type="hidden" id="project-img-url" required />
+            <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
+              <span style="font-size: 1.3rem; color: #aaa;">OR paste direct URL:</span>
+              <input type="text" id="project-img-url" required placeholder="https://example.com/image.jpg" style="padding: 0.8rem; font-size: 1.4rem;" oninput="document.getElementById('project-img-preview').src = this.value; document.getElementById('project-img-preview').style.display = this.value ? 'block' : 'none';" />
+            </div>
             <div style="margin-top: 1rem;">
               <img id="project-img-preview" src="" alt="Thumbnail Preview" style="max-width: 100%; max-height: 150px; display: none; border-radius: 0.5rem;" />
             </div>

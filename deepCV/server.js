@@ -52,25 +52,35 @@ const authenticateAdmin = (req, res, next) => {
 
 // Initialize DB and Tables
 async function initDB() {
-  // Step 1: Connect to default 'postgres' database to ensure 'portfolio_db' exists
-  const client = new Client({ ...dbConfig, database: 'postgres' });
-  try {
-    await client.connect();
-    const res = await client.query("SELECT 1 FROM pg_database WHERE datname = 'portfolio_db'");
-    if (res.rowCount === 0) {
-      console.log("Database 'portfolio_db' does not exist. Creating it...");
-      // CREATE DATABASE cannot run inside a transaction block, so we run it directly
-      await client.query("CREATE DATABASE portfolio_db");
-      console.log("Database 'portfolio_db' created successfully.");
-    }
-  } catch (err) {
-    console.error("Error checking/creating database:", err.message);
-  } finally {
-    await client.end();
-  }
+  const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
-  // Step 2: Initialize Connection Pool to 'portfolio_db'
-  pool = new Pool({ ...dbConfig, database: 'portfolio_db' });
+  if (connectionString) {
+    console.log("Connecting to cloud database...");
+    pool = new Pool({
+      connectionString: connectionString,
+      ssl: { rejectUnauthorized: false }
+    });
+  } else {
+    // Step 1: Connect to default 'postgres' database to ensure 'portfolio_db' exists locally
+    const client = new Client({ ...dbConfig, database: 'postgres' });
+    try {
+      await client.connect();
+      const res = await client.query("SELECT 1 FROM pg_database WHERE datname = 'portfolio_db'");
+      if (res.rowCount === 0) {
+        console.log("Database 'portfolio_db' does not exist. Creating it...");
+        // CREATE DATABASE cannot run inside a transaction block, so we run it directly
+        await client.query("CREATE DATABASE portfolio_db");
+        console.log("Database 'portfolio_db' created successfully.");
+      }
+    } catch (err) {
+      console.error("Error checking/creating database locally:", err.message);
+    } finally {
+      await client.end();
+    }
+
+    // Step 2: Initialize Connection Pool to local 'portfolio_db'
+    pool = new Pool({ ...dbConfig, database: 'portfolio_db' });
+  }
 
   // Step 3: Create Tables
   const createTablesSql = `
@@ -520,9 +530,16 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start Express Server after DB init
-initDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+// Start Express Server after DB init (conditional for Vercel serverless mode)
+if (!process.env.VERCEL) {
+  initDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}/`);
+    });
   });
-});
+} else {
+  // In Vercel serverless functions, we initialize the DB, but don't call app.listen()
+  initDB();
+}
+
+module.exports = app;
