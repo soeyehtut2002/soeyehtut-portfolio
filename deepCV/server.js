@@ -31,6 +31,7 @@ const dbConfig = {
 };
 
 let pool;
+let dbError = null;
 
 const mockDb = {
   bio: [
@@ -277,6 +278,7 @@ app.get('/api/debug-env', (req, res) => {
     hasImgbbKey: !!process.env.IMGBB_API_KEY,
     hasPostgresUrl: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL),
     isMockDb: pool === mockPool,
+    dbError: dbError,
     projectName: process.env.VERCEL_PROJECT_NAME,
     vercelEnv: process.env.VERCEL_ENV,
     envKeys: Object.keys(process.env)
@@ -297,6 +299,7 @@ async function initDB() {
       await pool.query("SELECT 1");
       console.log("Cloud database connected successfully.");
     } catch (err) {
+      dbError = err.message;
       console.warn("Cloud database connection failed. Falling back to in-memory mock database:", err.message);
       pool = mockPool;
       return;
