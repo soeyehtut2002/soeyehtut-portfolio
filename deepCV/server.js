@@ -279,6 +279,7 @@ app.get('/api/debug-env', (req, res) => {
     hasPostgresUrl: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL),
     isMockDb: pool === mockPool,
     dbError: dbError,
+    gitCommit: process.env.RENDER_GIT_COMMIT,
     projectName: process.env.VERCEL_PROJECT_NAME,
     vercelEnv: process.env.VERCEL_ENV,
     envKeys: Object.keys(process.env)
