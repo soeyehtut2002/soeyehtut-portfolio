@@ -274,9 +274,12 @@ const authenticateAdmin = (req, res, next) => {
 };
 
 app.get('/api/debug-env', (req, res) => {
+  const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   res.json({
     hasImgbbKey: !!process.env.IMGBB_API_KEY,
-    hasPostgresUrl: !!(process.env.DATABASE_URL || process.env.POSTGRES_URL),
+    hasPostgresUrl: !!dbUrl,
+    postgresUrlLength: dbUrl ? dbUrl.length : 0,
+    postgresUrlPrefix: dbUrl ? dbUrl.substring(0, 15) : "",
     isMockDb: pool === mockPool,
     dbError: dbError,
     gitCommit: process.env.RENDER_GIT_COMMIT,
