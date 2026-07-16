@@ -159,7 +159,7 @@ const mockPool = {
       let newRow = { id: mockIdCounter };
       
       if (q.includes("insert into bio")) {
-        newRow = { id: mockIdCounter, name: params[0], title: params[1], description: params[2], avatar_url: params[3], about_image_url: params[4] };
+        newRow = { id: mockIdCounter, name: params[0], title: params[1], description: params[2], avatar_url: params[3], about_image_url: params[4], cv_url: params[5] };
         mockDb.bio.push(newRow);
       }
       else if (q.includes("insert into projects")) {
@@ -189,12 +189,13 @@ const mockPool = {
     // UPDATE
     if (q.startsWith("update")) {
       if (q.includes("update bio")) {
-        const row = mockDb.bio.find(b => b.id === Number(params[5])) || mockDb.bio[0] || {};
+        const row = mockDb.bio.find(b => b.id === Number(params[6])) || mockDb.bio[0] || {};
         row.name = params[0];
         row.title = params[1];
         row.description = params[2];
         row.avatar_url = params[3];
         row.about_image_url = params[4];
+        row.cv_url = params[5];
         return { rows: [row], rowCount: 1 };
       }
       if (q.includes("update section_settings")) {
@@ -397,6 +398,7 @@ async function initDB() {
     await pool.query(createTablesSql);
     // Alter bio table to ensure about_image_url column exists dynamically
     await pool.query("ALTER TABLE bio ADD COLUMN IF NOT EXISTS about_image_url VARCHAR(255)");
+    await pool.query("ALTER TABLE bio ADD COLUMN IF NOT EXISTS cv_url VARCHAR(255)");
     console.log("Tables created or checked successfully.");
 
     // Seed Bio if empty
@@ -404,13 +406,14 @@ async function initDB() {
     if (parseInt(bioCount.rows[0].count) === 0) {
       console.log("Seeding default bio...");
       await pool.query(
-        "INSERT INTO bio (name, title, description, avatar_url, about_image_url) VALUES ($1, $2, $3, $4, $5)",
+        "INSERT INTO bio (name, title, description, avatar_url, about_image_url, cv_url) VALUES ($1, $2, $3, $4, $5, $6)",
         [
           "Soe Ye Htut",
           "Frontend Developer",
           "Motivated junior developer with a strong foundation seeking to contribute to a dynamic team. Eager to learn, enhance problem-solving skills, and work on innovative projects in a collaborative environment.",
           "image/image/home-img.png",
-          "image/image/cvimage.png"
+          "image/image/cvimage.png",
+          null
         ]
       );
     }
@@ -524,20 +527,20 @@ app.get('/api/bio', async (req, res) => {
 });
 
 app.put('/api/admin/bio', authenticateAdmin, async (req, res) => {
-  const { name, title, description, avatar_url, about_image_url } = req.body;
+  const { name, title, description, avatar_url, about_image_url, cv_url } = req.body;
   try {
     // Check if bio row exists
     const check = await pool.query("SELECT id FROM bio LIMIT 1");
     let result;
     if (check.rowCount > 0) {
       result = await pool.query(
-        "UPDATE bio SET name=$1, title=$2, description=$3, avatar_url=$4, about_image_url=$5 WHERE id=$6 RETURNING *",
-        [name, title, description, avatar_url, about_image_url, check.rows[0].id]
+        "UPDATE bio SET name=$1, title=$2, description=$3, avatar_url=$4, about_image_url=$5, cv_url=$6 WHERE id=$7 RETURNING *",
+        [name, title, description, avatar_url, about_image_url, cv_url, check.rows[0].id]
       );
     } else {
       result = await pool.query(
-        "INSERT INTO bio (name, title, description, avatar_url, about_image_url) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        [name, title, description, avatar_url, about_image_url]
+        "INSERT INTO bio (name, title, description, avatar_url, about_image_url, cv_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+        [name, title, description, avatar_url, about_image_url, cv_url]
       );
     }
     res.json(result.rows[0]);
@@ -886,6 +889,25 @@ app.post('/api/admin/upload', authenticateAdmin, upload.single('image'), async (
   } catch (err) {
     console.error("Upload error:", err.message);
     return res.status(500).json({ error: "Upload failed: " + err.message });
+  }
+});
+
+// 6.5 CV Upload Endpoint (Local only)
+app.post('/api/admin/upload/cv', authenticateAdmin, upload.single('cv_file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+  try {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const filename = uniqueSuffix + path.extname(req.file.originalname);
+    const localPath = path.join(uploadsDir, filename);
+    fs.writeFileSync(localPath, req.file.buffer);
+    const fileUrl = \`/uploads/\${filename}\`;
+    console.log("Saved CV locally:", fileUrl);
+    return res.json({ fileUrl });
+  } catch (err) {
+    console.error("CV Upload error:", err.message);
+    return res.status(500).json({ error: "CV Upload failed: " + err.message });
   }
 });
 

@@ -932,9 +932,9 @@
         background: var(--second-bg-color);
         padding: 3rem;
         border-radius: 1.5rem;
-        max-width: 600px;
+        max-width: 800px;
         width: 100%;
-        max-height: 85vh;
+        max-height: 90vh;
         overflow-y: auto;
         position: relative;
         box-shadow: 0 0 2rem rgba(0, 255, 239, 0.2);
@@ -944,6 +944,69 @@
       @keyframes modalZoomIn {
         from { transform: scale(0.8); opacity: 0; }
         to { transform: scale(1); opacity: 1; }
+      }
+
+      .modal-body-layout {
+        display: flex;
+        gap: 3rem;
+        margin-top: 1rem;
+      }
+      
+      .modal-left-col {
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      .modal-right-col {
+        flex: 1.3;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      
+      #modal-project-img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 1rem;
+        border: 2px solid rgba(0, 255, 239, 0.2);
+      }
+      
+      #modal-project-desc {
+        font-size: 1.5rem;
+        color: #ccc;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 1rem;
+      }
+      
+      #modal-project-desc::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      #modal-project-desc::-webkit-scrollbar-thumb {
+        background: rgba(0, 255, 239, 0.2);
+        border-radius: 3px;
+      }
+      
+      #modal-project-desc::-webkit-scrollbar-thumb:hover {
+        background: var(--main-color);
+      }
+      
+      @media (max-width: 768px) {
+        .modal-body-layout {
+          flex-direction: column;
+          gap: 2rem;
+        }
+        .modal-left-col, .modal-right-col {
+          width: 100%;
+        }
       }
 
       .modal-header {
@@ -1262,7 +1325,7 @@
           <a href="#" style="--i: 3"><i class="fab fa-instagram"></i></a>
           <a href="#" style="--i: 4"><i class="fab fa-linkedin-in"></i></a>
         </div>
-        <a href="cv/SoeYeHtut-CV.pdf" class="btn">Download CV</a>
+        <a href="#" id="cv-download-btn" class="btn" style="display: none;" target="_blank" rel="noopener noreferrer">Download CV</a>
       </div>
 
       <div class="home-image">
@@ -1481,38 +1544,60 @@
       </div>
     </footer>
 
-    <!-- Reviews Modal -->
-    <div id="reviews-modal" class="modal">
-      <div class="modal-content">
+    <!-- Project Details Modal -->
+    <div id="project-details-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px;">
         <div class="modal-header">
-          <h3 id="modal-project-title">Project Reviews</h3>
-          <span class="close-modal" id="close-reviews-modal">&times;</span>
+          <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+            <h3 id="modal-project-title" style="margin: 0;">Project Title</h3>
+            <span id="modal-project-type" style="font-size: 1.2rem; background: var(--main-color); color: var(--second-bg-color); padding: 0.3rem 1rem; border-radius: 2rem; font-weight: 600; text-transform: uppercase;">type</span>
+          </div>
+          <span class="close-modal" id="close-project-details-modal">&times;</span>
         </div>
-        <div id="reviews-list-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
-          <!-- Reviews list -->
+        <div class="modal-body-layout">
+          <!-- Left Column: Image and Live Demo Link -->
+          <div class="modal-left-col">
+            <img id="modal-project-img" src="" alt="Project Image" />
+            <a id="modal-project-link" class="btn" href="" target="_blank" rel="noopener noreferrer" style="text-align: center; display: block; margin-top: 1rem; width: 100%; opacity: 1; animation: none;">
+              <i class="fas fa-external-link-alt" style="margin-right: 0.8rem;"></i>Visit Live Site
+            </a>
+          </div>
+          <!-- Right Column: Description and Reviews -->
+          <div class="modal-right-col">
+            <div>
+              <h4 style="font-size: 1.8rem; color: var(--main-color); margin-bottom: 0.8rem; font-weight: 600;">Description</h4>
+              <div id="modal-project-desc">Project description goes here.</div>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+              <h4 style="font-size: 1.8rem; color: var(--main-color); margin-bottom: 0.8rem; font-weight: 600;">Reviews</h4>
+              <div id="reviews-list-container" style="max-height: 180px; overflow-y: auto; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+                <!-- Reviews list -->
+              </div>
+              <form id="submit-review-form">
+                <input type="hidden" id="review-project-id" />
+                <div class="modal-form-group">
+                  <label for="reviewer-name">Your Name</label>
+                  <input type="text" id="reviewer-name" required placeholder="John Doe" />
+                </div>
+                <div class="modal-form-group">
+                  <label for="reviewer-rating">Rating</label>
+                  <select id="reviewer-rating" required>
+                    <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                    <option value="3">⭐⭐⭐ (3/5)</option>
+                    <option value="2">⭐⭐ (2/5)</option>
+                    <option value="1">⭐ (1/5)</option>
+                  </select>
+                </div>
+                <div class="modal-form-group">
+                  <label for="reviewer-comment">Review Comment</label>
+                  <textarea id="reviewer-comment" rows="2" required placeholder="Great project!"></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%; opacity: 1; animation: none;">Submit Review</button>
+              </form>
+            </div>
+          </div>
         </div>
-        <form id="submit-review-form">
-          <input type="hidden" id="review-project-id" />
-          <div class="modal-form-group">
-            <label for="reviewer-name">Your Name</label>
-            <input type="text" id="reviewer-name" required placeholder="John Doe" />
-          </div>
-          <div class="modal-form-group">
-            <label for="reviewer-rating">Rating</label>
-            <select id="reviewer-rating" required>
-              <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-              <option value="4">⭐⭐⭐⭐ (4/5)</option>
-              <option value="3">⭐⭐⭐ (3/5)</option>
-              <option value="2">⭐⭐ (2/5)</option>
-              <option value="1">⭐ (1/5)</option>
-            </select>
-          </div>
-          <div class="modal-form-group">
-            <label for="reviewer-comment">Review Comment</label>
-            <textarea id="reviewer-comment" rows="3" required placeholder="Great project!"></textarea>
-          </div>
-          <button type="submit" class="btn">Submit Review</button>
-        </form>
       </div>
     </div>
 
@@ -1615,6 +1700,14 @@
               document.getElementById('about-img').src = bio.about_image_url;
               document.getElementById('about-title').textContent = bio.title;
               document.getElementById('about-desc').textContent = bio.description;
+              
+              const cvBtn = document.getElementById('cv-download-btn');
+              if (bio.cv_url) {
+                cvBtn.href = bio.cv_url;
+                cvBtn.style.display = 'inline-block';
+              } else {
+                cvBtn.style.display = 'none';
+              }
             }
           }
         } catch (err) {
@@ -1707,10 +1800,9 @@
             <img src="${p.image_url || 'image/image/home-img.png'}" alt="${p.title}" />
             <div class="portfolio-layer">
               <h4>${p.title}</h4>
-              <p>${p.description}</p>
-              <div style="display: flex; gap: 1.5rem; margin-top: 1rem; align-items: center;">
-                <a href="${p.project_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; justify-content: center; align-items: center; width: 5rem; height: 5rem; background-color: var(--text-color); border-radius: 50%;"><i class="fas fa-external-link-alt" style="font-size: 2rem; color: var(--second-bg-color);"></i></a>
-                <button class="review-trigger-btn" onclick="openReviewsModal(${p.id}, '${p.title.replace(/'/g, "\\'")}')" style="display: inline-flex; justify-content: center; align-items: center; width: 5rem; height: 5rem; background-color: var(--text-color); border-radius: 50%; border: none; cursor: pointer;"><i class="fas fa-comment-dots" style="font-size: 2rem; color: var(--second-bg-color);"></i></button>
+              <div style="display: flex; gap: 1.5rem; margin-top: 1.5rem; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <a href="${p.project_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; justify-content: center; align-items: center; width: 5rem; height: 5rem; background-color: var(--text-color); border-radius: 50%; opacity: 1; animation: none;"><i class="fas fa-external-link-alt" style="font-size: 2rem; color: var(--second-bg-color);"></i></a>
+                <button class="btn project-details-btn" onclick="openProjectDetailsModal(${p.id})" style="padding: 1.2rem 2.4rem; font-size: 1.4rem; background: var(--text-color); color: var(--second-bg-color); border-radius: 2rem; border: none; cursor: pointer; font-weight: 600; box-shadow: none; opacity: 1; animation: none;">View Details</button>
               </div>
             </div>
           `;
@@ -1731,25 +1823,60 @@
         });
       });
 
-      // Reviews Modal Logic
-      const reviewsModal = document.getElementById('reviews-modal');
-      const closeReviewsModalBtn = document.getElementById('close-reviews-modal');
+      // Project Details Modal Logic
+      const projectDetailsModal = document.getElementById('project-details-modal');
+      const closeProjectDetailsModalBtn = document.getElementById('close-project-details-modal');
       const submitReviewForm = document.getElementById('submit-review-form');
 
-      closeReviewsModalBtn.onclick = () => {
-        reviewsModal.style.display = 'none';
+      closeProjectDetailsModalBtn.onclick = () => {
+        projectDetailsModal.style.display = 'none';
       };
 
       window.onclick = (e) => {
-        if (e.target === reviewsModal) {
-          reviewsModal.style.display = 'none';
+        if (e.target === projectDetailsModal) {
+          projectDetailsModal.style.display = 'none';
         }
       };
 
-      async function openReviewsModal(projectId, projectTitle) {
-        document.getElementById('modal-project-title').innerHTML = `Reviews for <span>${projectTitle}</span>`;
+      async function openProjectDetailsModal(projectId) {
+        const project = allProjects.find(pro => pro.id === projectId);
+        if (!project) return;
+
+        // Set Title
+        document.getElementById('modal-project-title').textContent = project.title;
+        
+        // Set Type Badge
+        const typeBadge = document.getElementById('modal-project-type');
+        if (typeBadge) {
+          typeBadge.textContent = project.type || 'Project';
+        }
+
+        // Set Image
+        const imgEl = document.getElementById('modal-project-img');
+        if (imgEl) {
+          imgEl.src = project.image_url || 'image/image/home-img.png';
+          imgEl.alt = project.title;
+        }
+
+        // Set Link
+        const linkEl = document.getElementById('modal-project-link');
+        if (linkEl) {
+          linkEl.href = project.project_url || '#';
+        }
+
+        // Set Description
+        const descEl = document.getElementById('modal-project-desc');
+        if (descEl) {
+          descEl.textContent = project.description || '';
+        }
+
+        // Set review form ID
         document.getElementById('review-project-id').value = projectId;
-        reviewsModal.style.display = 'flex';
+
+        // Open modal
+        projectDetailsModal.style.display = 'flex';
+
+        // Load reviews
         loadReviewsForProject(projectId);
       }
 

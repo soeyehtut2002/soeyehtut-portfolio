@@ -523,6 +523,15 @@
                   <img id="bio-about-preview" src="" alt="About Preview" style="max-width: 120px; border-radius: 10px; display: none; border: 2px solid var(--main-color);" />
                 </div>
               </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>CV Document (PDF)</label>
+                <input type="file" id="bio-cv-file" accept=".pdf,.doc,.docx" onchange="handleCVUpload()" />
+                <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                  <span style="font-size: 1.2rem; color: #aaa;">Current CV URL:</span>
+                  <input type="text" id="bio-cv-url" placeholder="/uploads/cv.pdf" style="padding: 0.6rem; font-size: 1.3rem; flex: 1;" readonly />
+                  <button type="button" class="btn btn-danger" style="width: auto; padding: 0.6rem 1.2rem; font-size: 1.2rem;" onclick="document.getElementById('bio-cv-url').value = ''; showToast('CV removed (click Save Changes to confirm)')"><i class="fas fa-trash"></i> Remove CV</button>
+                </div>
+              </div>
             </div>
             <button type="submit" class="btn" style="width: auto; margin-top: 2rem;">Save Changes</button>
           </form>
@@ -814,6 +823,31 @@
         }
       }
 
+      async function handleCVUpload() {
+        const fileInput = document.getElementById('bio-cv-file');
+        if (fileInput.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('cv_file', fileInput.files[0]);
+
+        try {
+          const res = await fetch('/api/admin/upload/cv', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+          });
+          const data = await res.json();
+          if (res.ok) {
+            document.getElementById('bio-cv-url').value = data.fileUrl;
+            showToast('CV uploaded successfully! Save Changes to confirm.');
+          } else {
+            showToast(data.error || 'CV upload failed', 'error');
+          }
+        } catch (err) {
+          showToast('CV upload failed', 'error');
+        }
+      }
+
       // 1. Bio Operations
       async function loadBio() {
         try {
@@ -825,6 +859,7 @@
             document.getElementById('bio-description').value = bio.description || '';
             document.getElementById('bio-avatar-url').value = bio.avatar_url || '';
             document.getElementById('bio-about-url').value = bio.about_image_url || '';
+            document.getElementById('bio-cv-url').value = bio.cv_url || '';
             
             if (bio.avatar_url) {
               const preview = document.getElementById('bio-avatar-preview');
@@ -849,7 +884,8 @@
           title: document.getElementById('bio-title').value,
           description: document.getElementById('bio-description').value,
           avatar_url: document.getElementById('bio-avatar-url').value,
-          about_image_url: document.getElementById('bio-about-url').value
+          about_image_url: document.getElementById('bio-about-url').value,
+          cv_url: document.getElementById('bio-cv-url').value
         };
 
         try {
