@@ -12,7 +12,7 @@ This portfolio is a full-stack web application built to highlight my expertise i
 - **Backend:** Node.js, Express.js
 - **Database:** PostgreSQL (via `pg`)
 - **File Uploads:** Multer
-- **Deployment:** Vercel (Serverless Functions)
+- **Deployment:** Render
 
 ## 📁 Project Structure
 
@@ -37,7 +37,7 @@ To run this project locally on your machine, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/soeyehtut2002/soeyehtut-portfolio.git
    cd soeyehtut-portfolio-main
    ```
 
@@ -63,8 +63,10 @@ To run this project locally on your machine, follow these steps:
 
 ## 🌐 Deployment
 
-This project is configured for seamless deployment on [Vercel](https://vercel.com).
-The `vercel.json` file handles routing all `/api/*` requests to the Express backend and serves the static frontend files from the root.
+This project is configured for deployment on [Render](https://render.com). 
+To deploy, you can create a new **Web Service** on Render, connect your GitHub repository, and use the following settings:
+- **Build Command:** `npm install` (inside the `deepCV` folder)
+- **Start Command:** `npm start` (inside the `deepCV` folder)
 
 ## 📬 Contact
 
