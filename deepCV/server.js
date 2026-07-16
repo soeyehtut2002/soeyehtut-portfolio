@@ -902,7 +902,7 @@ app.post('/api/admin/upload/cv', authenticateAdmin, upload.single('cv_file'), as
     const filename = uniqueSuffix + path.extname(req.file.originalname);
     const localPath = path.join(uploadsDir, filename);
     fs.writeFileSync(localPath, req.file.buffer);
-    const fileUrl = \`/uploads/\${filename}\`;
+    const fileUrl = `/uploads/${filename}`;
     console.log("Saved CV locally:", fileUrl);
     return res.json({ fileUrl });
   } catch (err) {
