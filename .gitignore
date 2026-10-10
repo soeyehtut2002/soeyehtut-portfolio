@@ -3,3 +3,6 @@ deepCV/node_modules/
 *.log
 deepCV/uploads/*
 !deepCV/uploads/.gitkeep
+deepCV/scratch/
+.env
+.env.*

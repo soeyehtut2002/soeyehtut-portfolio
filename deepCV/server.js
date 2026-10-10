@@ -6,8 +6,8 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const ADMIN_PASSWORD = 'admin123'; // Simple admin password
-const SESSION_TOKEN = 'admin-session-token-secret-123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'; // Admin password (configurable via env)
+const SESSION_TOKEN = process.env.SESSION_SECRET || 'admin-session-token-secret-123';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -39,9 +39,29 @@ const mockDb = {
       id: 1,
       name: "Soe Ye Htut",
       title: "Frontend Developer",
+      greeting: "Hello, It's Me",
+      roles: "Frontend Developer, Web Designer, React Developer",
       description: "Motivated junior developer with a strong foundation seeking to contribute to a dynamic team. Eager to learn, enhance problem-solving skills, and work on innovative projects in a collaborative environment.",
       avatar_url: "image/image/home-img.png",
-      about_image_url: "image/image/cvimage.png"
+      about_image_url: "image/image/cvimage.png",
+      cv_url: "cv/SoeYeHtut-CV.pdf",
+      about_subtitle: "Frontend Developer",
+      about_description: "I'm a driven junior software developer with a solid foundation in modern web programming and UI development tools. I'm eager to leverage my skills and keep learning to contribute meaningfully to a collaborative team. I'm passionate about tackling challenges and building user-centric interfaces.",
+      stat1_number: "3+",
+      stat1_label: "Featured Projects",
+      stat2_number: "100%",
+      stat2_label: "Dedication",
+      stat3_number: "24/7",
+      stat3_label: "Eager to Learn",
+      social_facebook: "https://facebook.com",
+      social_twitter: "https://twitter.com",
+      social_instagram: "https://instagram.com",
+      social_linkedin: "https://linkedin.com",
+      social_github: "https://github.com",
+      contact_email: "soeyehtut@example.com",
+      contact_phone: "+95 9123456789",
+      contact_location: "Yangon, Myanmar",
+      footer_text: "Copyright © 2026 by Soe Ye Htut | All Rights Reserved."
     }
   ],
   projects: [
@@ -68,13 +88,29 @@ const mockDb = {
       image_url: "image/image/usedcarportal.png",
       project_url: "#",
       type: "frontend"
+    },
+    {
+      id: 4,
+      title: "Kasaryar - Game Top-Up Engine",
+      description: "KASARYAR is Myanmar's premier digital game top-up engine. It is designed as a direct platform for gamers in Myanmar to purchase in-game currencies, diamonds, and packages instantly using local payment methods.",
+      image_url: "https://files.catbox.moe/i182bd.png",
+      project_url: "https://kasaryar.com",
+      type: "fullstack"
+    },
+    {
+      id: 5,
+      title: "Service Hub - Marketplace Platform",
+      description: "ServiceHub is a comprehensive full-stack service marketplace connecting customers with vetted local service providers. Features real-time bookings, provider schedule management, customer reviews, and a centralized admin moderation dashboard.",
+      image_url: "https://files.catbox.moe/b3l8yo.jpg",
+      project_url: "https://servicehub0-2-frontend.onrender.com/",
+      type: "fullstack"
     }
   ],
   section_settings: [
     { id: 1, section_id: 'home', title: 'Home Banner', is_visible: true },
     { id: 2, section_id: 'about', title: 'About Me', is_visible: true },
     { id: 3, section_id: 'services', title: 'My Services', is_visible: true },
-    { id: 4, section_id: 'experience', title: 'My Journey (Timeline)', is_visible: true },
+    { id: 4, section_id: 'experience', title: 'My Journey', is_visible: true },
     { id: 5, section_id: 'skills', title: 'Technical Skills', is_visible: true },
     { id: 6, section_id: 'soft-skills', title: 'Soft Skills', is_visible: true },
     { id: 7, section_id: 'portfolio', title: 'Latest Projects', is_visible: true },
@@ -83,16 +119,61 @@ const mockDb = {
   journey: [
     {
       id: 1,
+      title: "B.S. in Computer Science",
+      description: "Studied software engineering principles, algorithms, database management systems, and modern web application development.",
+      time_period: "2021 - 2026"
+    },
+    {
+      id: 2,
       title: "Freelance Web Developer",
       description: "Developing frontend solutions, responsive web interfaces, and single-page apps for local and remote clients.",
       time_period: "2024 - Present"
     },
     {
-      id: 2,
-      title: "B.S. in Computer Science",
-      description: "Studied software engineering principles, algorithms, database management systems, and web application architectures.",
-      time_period: "2021 - 2024"
+      id: 3,
+      title: "IT Instructor / Coding Teacher - IT4Kids",
+      description: "Teach basic programming and computer skills to children, guide coding activities, and explain concepts in an easy-to-understand manner.",
+      time_period: "2026 - Present"
     }
+  ],
+  services: [
+    {
+      id: 1,
+      title: "Web Development",
+      description: "Building responsive, high-performance web applications tailored to modern standards using HTML, CSS, JavaScript, and React.",
+      icon: "fas fa-code"
+    },
+    {
+      id: 2,
+      title: "UI/UX Design",
+      description: "Designing clean, interactive, and user-centric wireframes and layouts that provide seamless, intuitive user experiences.",
+      icon: "fas fa-palette"
+    },
+    {
+      id: 3,
+      title: "App Development",
+      description: "Developing functional and responsive mobile user interfaces and apps designed to scale across Android and iOS platforms.",
+      icon: "fas fa-mobile-alt"
+    }
+  ],
+  skills: [
+    { id: 1, name: "HTML5", percentage: 90, icon: "fab fa-html5", color: "#E34F26" },
+    { id: 2, name: "CSS3", percentage: 88, icon: "fab fa-css3-alt", color: "#1572B6" },
+    { id: 3, name: "JavaScript", percentage: 85, icon: "fab fa-js-square", color: "#F7DF1E" },
+    { id: 4, name: "React", percentage: 80, icon: "fab fa-react", color: "#61DAFB" },
+    { id: 5, name: "Node.js", percentage: 75, icon: "fab fa-node-js", color: "#68A063" },
+    { id: 6, name: "Bootstrap", percentage: 85, icon: "fab fa-bootstrap", color: "#7952B3" },
+    { id: 7, name: "PostgreSQL", percentage: 75, icon: "fas fa-database", color: "#336791" },
+    { id: 8, name: "Java", percentage: 70, icon: "fab fa-java", color: "#F89820" },
+    { id: 9, name: "Python", percentage: 75, icon: "fab fa-python", color: "#3776AB" }
+  ],
+  soft_skills: [
+    { id: 1, title: "Communication", description: "Clear expression and active listening to ensure effective collaboration and understanding across team members.", icon: "fas fa-comments" },
+    { id: 2, title: "Teamwork", description: "Collaborative and cooperative spirit that values collective success over individual achievement.", icon: "fas fa-users" },
+    { id: 3, title: "Creativity", description: "Innovative and original thinking to develop unique solutions to complex frontend problems.", icon: "fas fa-lightbulb" },
+    { id: 4, title: "Adaptability", description: "Flexibility and quick adjustment to changing project requirements, technologies, and team environments.", icon: "fas fa-sliders" },
+    { id: 5, title: "Continuous Growth", description: "Open to feedback and continuous skill enhancement through dedicated practice and learning.", icon: "fas fa-chart-line" },
+    { id: 6, title: "Collaboration", description: "Working together towards shared goals while respecting and leveraging diverse perspectives.", icon: "fas fa-handshake" }
   ],
   reviews: [],
   messages: []
@@ -116,11 +197,15 @@ const mockPool = {
       else if (q.includes("from projects")) count = mockDb.projects.length;
       else if (q.includes("from section_settings")) count = mockDb.section_settings.length;
       else if (q.includes("from journey")) count = mockDb.journey.length;
+      else if (q.includes("from services")) count = mockDb.services.length;
+      else if (q.includes("from skills")) count = mockDb.skills.length;
+      else if (q.includes("from soft_skills")) count = mockDb.soft_skills.length;
       return { rows: [{ count: count.toString() }], rowCount: 1 };
     }
     
     // SELECT ALL
-    if (q.startsWith("select *") || q.startsWith("select r.*")) {
+    // SELECT Queries
+    if (q.startsWith("select")) {
       if (q.includes("from bio")) {
         return { rows: mockDb.bio, rowCount: mockDb.bio.length };
       }
@@ -132,6 +217,15 @@ const mockPool = {
       }
       if (q.includes("from journey")) {
         return { rows: mockDb.journey, rowCount: mockDb.journey.length };
+      }
+      if (q.includes("from services")) {
+        return { rows: mockDb.services, rowCount: mockDb.services.length };
+      }
+      if (q.includes("from skills")) {
+        return { rows: mockDb.skills, rowCount: mockDb.skills.length };
+      }
+      if (q.includes("from soft_skills")) {
+        return { rows: mockDb.soft_skills, rowCount: mockDb.soft_skills.length };
       }
       if (q.includes("from messages")) {
         return { rows: mockDb.messages, rowCount: mockDb.messages.length };
@@ -159,7 +253,38 @@ const mockPool = {
       let newRow = { id: mockIdCounter };
       
       if (q.includes("insert into bio")) {
-        newRow = { id: mockIdCounter, name: params[0], title: params[1], description: params[2], avatar_url: params[3], about_image_url: params[4], cv_url: params[5] };
+        if (params.length >= 24) {
+          newRow = {
+            id: mockIdCounter,
+            name: params[0],
+            title: params[1],
+            greeting: params[2],
+            roles: params[3],
+            description: params[4],
+            avatar_url: params[5],
+            about_image_url: params[6],
+            cv_url: params[7],
+            about_subtitle: params[8],
+            about_description: params[9],
+            stat1_number: params[10],
+            stat1_label: params[11],
+            stat2_number: params[12],
+            stat2_label: params[13],
+            stat3_number: params[14],
+            stat3_label: params[15],
+            social_facebook: params[16],
+            social_twitter: params[17],
+            social_instagram: params[18],
+            social_linkedin: params[19],
+            social_github: params[20],
+            contact_email: params[21],
+            contact_phone: params[22],
+            contact_location: params[23],
+            footer_text: params[24]
+          };
+        } else {
+          newRow = { id: mockIdCounter, name: params[0], title: params[1], description: params[2], avatar_url: params[3], about_image_url: params[4], cv_url: params[5] };
+        }
         mockDb.bio.push(newRow);
       }
       else if (q.includes("insert into projects")) {
@@ -173,6 +298,18 @@ const mockPool = {
       else if (q.includes("insert into journey")) {
         newRow = { id: mockIdCounter, title: params[0], description: params[1], time_period: params[2], created_at: new Date() };
         mockDb.journey.push(newRow);
+      }
+      else if (q.includes("insert into services")) {
+        newRow = { id: mockIdCounter, title: params[0], description: params[1], icon: params[2], created_at: new Date() };
+        mockDb.services.push(newRow);
+      }
+      else if (q.includes("insert into skills")) {
+        newRow = { id: mockIdCounter, name: params[0], percentage: Number(params[1]), icon: params[2], color: params[3], created_at: new Date() };
+        mockDb.skills.push(newRow);
+      }
+      else if (q.includes("insert into soft_skills")) {
+        newRow = { id: mockIdCounter, title: params[0], description: params[1], icon: params[2], created_at: new Date() };
+        mockDb.soft_skills.push(newRow);
       }
       else if (q.includes("insert into reviews")) {
         newRow = { id: mockIdCounter, project_id: Number(params[0]), reviewer_name: params[1], rating: Number(params[2]), comment: params[3], created_at: new Date() };
@@ -189,19 +326,50 @@ const mockPool = {
     // UPDATE
     if (q.startsWith("update")) {
       if (q.includes("update bio")) {
-        const row = mockDb.bio.find(b => b.id === Number(params[6])) || mockDb.bio[0] || {};
-        row.name = params[0];
-        row.title = params[1];
-        row.description = params[2];
-        row.avatar_url = params[3];
-        row.about_image_url = params[4];
-        row.cv_url = params[5];
+        const row = mockDb.bio.find(b => b.id === Number(params[params.length - 1])) || mockDb.bio[0] || {};
+        if (params.length >= 24) {
+          row.name = params[0];
+          row.title = params[1];
+          row.greeting = params[2];
+          row.roles = params[3];
+          row.description = params[4];
+          row.avatar_url = params[5];
+          row.about_image_url = params[6];
+          row.cv_url = params[7];
+          row.about_subtitle = params[8];
+          row.about_description = params[9];
+          row.stat1_number = params[10];
+          row.stat1_label = params[11];
+          row.stat2_number = params[12];
+          row.stat2_label = params[13];
+          row.stat3_number = params[14];
+          row.stat3_label = params[15];
+          row.social_facebook = params[16];
+          row.social_twitter = params[17];
+          row.social_instagram = params[18];
+          row.social_linkedin = params[19];
+          row.social_github = params[20];
+          row.contact_email = params[21];
+          row.contact_phone = params[22];
+          row.contact_location = params[23];
+          row.footer_text = params[24];
+        } else {
+          row.name = params[0];
+          row.title = params[1];
+          row.description = params[2];
+          row.avatar_url = params[3];
+          row.about_image_url = params[4];
+          row.cv_url = params[5];
+        }
         return { rows: [row], rowCount: 1 };
       }
       if (q.includes("update section_settings")) {
-        const row = mockDb.section_settings.find(s => s.section_id === params[1]);
+        const row = mockDb.section_settings.find(s => s.section_id === params[1] || s.section_id === params[2]);
         if (row) {
           row.is_visible = params[0] === true || params[0] === 'true';
+          if (params.length >= 3 && params[1]) {
+            row.title = params[1];
+          }
         }
         return { rows: [row], rowCount: row ? 1 : 0 };
       }
@@ -225,6 +393,34 @@ const mockPool = {
         }
         return { rows: [row], rowCount: row ? 1 : 0 };
       }
+      if (q.includes("update services")) {
+        const row = mockDb.services.find(s => s.id === Number(params[3]));
+        if (row) {
+          row.title = params[0];
+          row.description = params[1];
+          row.icon = params[2];
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
+      if (q.includes("update skills")) {
+        const row = mockDb.skills.find(s => s.id === Number(params[4]));
+        if (row) {
+          row.name = params[0];
+          row.percentage = Number(params[1]);
+          row.icon = params[2];
+          row.color = params[3];
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
+      if (q.includes("update soft_skills")) {
+        const row = mockDb.soft_skills.find(s => s.id === Number(params[3]));
+        if (row) {
+          row.title = params[0];
+          row.description = params[1];
+          row.icon = params[2];
+        }
+        return { rows: [row], rowCount: row ? 1 : 0 };
+      }
     }
     
     // DELETE
@@ -242,6 +438,24 @@ const mockPool = {
         const index = mockDb.journey.findIndex(j => j.id === targetId);
         if (index !== -1) {
           deletedRow = mockDb.journey.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from services")) {
+        const index = mockDb.services.findIndex(s => s.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.services.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from skills")) {
+        const index = mockDb.skills.findIndex(s => s.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.skills.splice(index, 1)[0];
+        }
+      }
+      else if (q.includes("from soft_skills")) {
+        const index = mockDb.soft_skills.findIndex(s => s.id === targetId);
+        if (index !== -1) {
+          deletedRow = mockDb.soft_skills.splice(index, 1)[0];
         }
       }
       else if (q.includes("from reviews")) {
@@ -392,13 +606,62 @@ async function initDB() {
       time_period VARCHAR(50) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS services (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(150) NOT NULL,
+      description TEXT NOT NULL,
+      icon VARCHAR(100) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS skills (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      percentage INT NOT NULL DEFAULT 80,
+      icon VARCHAR(100) NOT NULL,
+      color VARCHAR(50) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS soft_skills (
+      id SERIAL PRIMARY KEY,
+      title VARCHAR(150) NOT NULL,
+      description TEXT NOT NULL,
+      icon VARCHAR(100) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   try {
     await pool.query(createTablesSql);
-    // Alter bio table to ensure about_image_url column exists dynamically
-    await pool.query("ALTER TABLE bio ADD COLUMN IF NOT EXISTS about_image_url VARCHAR(255)");
-    await pool.query("ALTER TABLE bio ADD COLUMN IF NOT EXISTS cv_url VARCHAR(255)");
+    // Alter bio table to ensure all configurable section columns exist dynamically
+    const bioColumns = [
+      "about_image_url VARCHAR(255)",
+      "cv_url VARCHAR(255)",
+      "greeting VARCHAR(100) DEFAULT 'Hello, It\\'s Me'",
+      "roles VARCHAR(255) DEFAULT 'Frontend Developer'",
+      "about_subtitle VARCHAR(150)",
+      "about_description TEXT",
+      "stat1_number VARCHAR(50) DEFAULT '3+'",
+      "stat1_label VARCHAR(100) DEFAULT 'Featured Projects'",
+      "stat2_number VARCHAR(50) DEFAULT '100%'",
+      "stat2_label VARCHAR(100) DEFAULT 'Dedication'",
+      "stat3_number VARCHAR(50) DEFAULT '24/7'",
+      "stat3_label VARCHAR(100) DEFAULT 'Eager to Learn'",
+      "social_facebook VARCHAR(255)",
+      "social_twitter VARCHAR(255)",
+      "social_instagram VARCHAR(255)",
+      "social_linkedin VARCHAR(255)",
+      "social_github VARCHAR(255)",
+      "contact_email VARCHAR(100)",
+      "contact_phone VARCHAR(50)",
+      "contact_location VARCHAR(100)",
+      "footer_text VARCHAR(255)"
+    ];
+    for (const col of bioColumns) {
+      await pool.query(`ALTER TABLE bio ADD COLUMN IF NOT EXISTS ${col}`);
+    }
     console.log("Tables created or checked successfully.");
 
     // Seed Bio if empty
@@ -406,14 +669,45 @@ async function initDB() {
     if (parseInt(bioCount.rows[0].count) === 0) {
       console.log("Seeding default bio...");
       await pool.query(
-        "INSERT INTO bio (name, title, description, avatar_url, about_image_url, cv_url) VALUES ($1, $2, $3, $4, $5, $6)",
+        `INSERT INTO bio (
+          name, title, greeting, roles, description, avatar_url, about_image_url, cv_url,
+          about_subtitle, about_description,
+          stat1_number, stat1_label, stat2_number, stat2_label, stat3_number, stat3_label,
+          social_facebook, social_twitter, social_instagram, social_linkedin, social_github,
+          contact_email, contact_phone, contact_location, footer_text
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          $9, $10,
+          $11, $12, $13, $14, $15, $16,
+          $17, $18, $19, $20, $21,
+          $22, $23, $24, $25
+        )`,
         [
           "Soe Ye Htut",
           "Frontend Developer",
+          "Hello, It's Me",
+          "Frontend Developer, Web Designer, React Developer",
           "Motivated junior developer with a strong foundation seeking to contribute to a dynamic team. Eager to learn, enhance problem-solving skills, and work on innovative projects in a collaborative environment.",
           "image/image/home-img.png",
           "image/image/cvimage.png",
-          null
+          "cv/SoeYeHtut-CV.pdf",
+          "Frontend Developer",
+          "I'm a driven junior software developer with a solid foundation in modern web programming and UI development tools. I'm eager to leverage my skills and keep learning to contribute meaningfully to a collaborative team. I'm passionate about tackling challenges and building user-centric interfaces.",
+          "3+",
+          "Featured Projects",
+          "100%",
+          "Dedication",
+          "24/7",
+          "Eager to Learn",
+          "https://facebook.com",
+          "https://twitter.com",
+          "https://instagram.com",
+          "https://linkedin.com",
+          "https://github.com",
+          "soeyehtut@example.com",
+          "+95 9123456789",
+          "Yangon, Myanmar",
+          "Copyright © 2026 by Soe Ye Htut | All Rights Reserved."
         ]
       );
     }
@@ -443,6 +737,20 @@ async function initDB() {
           image_url: "image/image/usedcarportal.png",
           project_url: "#",
           type: "frontend"
+        },
+        {
+          title: "Kasaryar - Game Top-Up Engine",
+          description: "KASARYAR is Myanmar's premier digital game top-up engine. It is designed as a direct platform for gamers in Myanmar to purchase in-game currencies, diamonds, and packages instantly using local payment methods.",
+          image_url: "https://files.catbox.moe/i182bd.png",
+          project_url: "https://kasaryar.com",
+          type: "fullstack"
+        },
+        {
+          title: "Service Hub - Marketplace Platform",
+          description: "ServiceHub is a comprehensive full-stack service marketplace connecting customers with vetted local service providers. Features real-time bookings, provider schedule management, customer reviews, and a centralized admin moderation dashboard.",
+          image_url: "https://files.catbox.moe/b3l8yo.jpg",
+          project_url: "https://servicehub0-2-frontend.onrender.com/",
+          type: "fullstack"
         }
       ];
 
@@ -462,7 +770,7 @@ async function initDB() {
         { id: 'home', title: 'Home Banner' },
         { id: 'about', title: 'About Me' },
         { id: 'services', title: 'My Services' },
-        { id: 'experience', title: 'My Journey (Timeline)' },
+        { id: 'experience', title: 'My Journey' },
         { id: 'skills', title: 'Technical Skills' },
         { id: 'soft-skills', title: 'Soft Skills' },
         { id: 'portfolio', title: 'Latest Projects' },
@@ -482,20 +790,85 @@ async function initDB() {
       console.log("Seeding default journey items...");
       const defaultJourney = [
         {
+          title: "B.S. in Computer Science",
+          description: "Studied software engineering principles, algorithms, database management systems, and modern web application development.",
+          time_period: "2021 - 2026"
+        },
+        {
           title: "Freelance Web Developer",
           description: "Developing frontend solutions, responsive web interfaces, and single-page apps for local and remote clients.",
           time_period: "2024 - Present"
         },
         {
-          title: "B.S. in Computer Science",
-          description: "Studied software engineering principles, algorithms, database management systems, and web application architectures.",
-          time_period: "2021 - 2024"
+          title: "IT Instructor / Coding Teacher - IT4Kids",
+          description: "Teach basic programming and computer skills to children, guide coding activities, and explain concepts in an easy-to-understand manner.",
+          time_period: "2026 - Present"
         }
       ];
       for (const item of defaultJourney) {
         await pool.query(
           "INSERT INTO journey (title, description, time_period) VALUES ($1, $2, $3)",
           [item.title, item.description, item.time_period]
+        );
+      }
+    }
+
+    // Seed Services if empty
+    const srvCount = await pool.query("SELECT COUNT(*) FROM services");
+    if (parseInt(srvCount.rows[0].count) === 0) {
+      console.log("Seeding default services...");
+      const defaultServices = [
+        { title: "Web Development", description: "Building responsive, high-performance web applications tailored to modern standards using HTML, CSS, JavaScript, and React.", icon: "fas fa-code" },
+        { title: "UI/UX Design", description: "Designing clean, interactive, and user-centric wireframes and layouts that provide seamless, intuitive user experiences.", icon: "fas fa-palette" },
+        { title: "App Development", description: "Developing functional and responsive mobile user interfaces and apps designed to scale across Android and iOS platforms.", icon: "fas fa-mobile-alt" }
+      ];
+      for (const s of defaultServices) {
+        await pool.query(
+          "INSERT INTO services (title, description, icon) VALUES ($1, $2, $3)",
+          [s.title, s.description, s.icon]
+        );
+      }
+    }
+
+    // Seed Technical Skills if empty
+    const skillCount = await pool.query("SELECT COUNT(*) FROM skills");
+    if (parseInt(skillCount.rows[0].count) === 0) {
+      console.log("Seeding default skills...");
+      const defaultSkills = [
+        { name: "HTML5", percentage: 90, icon: "fab fa-html5", color: "#E34F26" },
+        { name: "CSS3", percentage: 88, icon: "fab fa-css3-alt", color: "#1572B6" },
+        { name: "JavaScript", percentage: 85, icon: "fab fa-js-square", color: "#F7DF1E" },
+        { name: "React", percentage: 80, icon: "fab fa-react", color: "#61DAFB" },
+        { name: "Node.js", percentage: 75, icon: "fab fa-node-js", color: "#68A063" },
+        { name: "Bootstrap", percentage: 85, icon: "fab fa-bootstrap", color: "#7952B3" },
+        { name: "PostgreSQL", percentage: 75, icon: "fas fa-database", color: "#336791" },
+        { name: "Java", percentage: 70, icon: "fab fa-java", color: "#F89820" },
+        { name: "Python", percentage: 75, icon: "fab fa-python", color: "#3776AB" }
+      ];
+      for (const sk of defaultSkills) {
+        await pool.query(
+          "INSERT INTO skills (name, percentage, icon, color) VALUES ($1, $2, $3, $4)",
+          [sk.name, sk.percentage, sk.icon, sk.color]
+        );
+      }
+    }
+
+    // Seed Soft Skills if empty
+    const softCount = await pool.query("SELECT COUNT(*) FROM soft_skills");
+    if (parseInt(softCount.rows[0].count) === 0) {
+      console.log("Seeding default soft skills...");
+      const defaultSoft = [
+        { title: "Communication", description: "Clear expression and active listening to ensure effective collaboration and understanding across team members.", icon: "fas fa-comments" },
+        { title: "Teamwork", description: "Collaborative and cooperative spirit that values collective success over individual achievement.", icon: "fas fa-users" },
+        { title: "Creativity", description: "Innovative and original thinking to develop unique solutions to complex frontend problems.", icon: "fas fa-lightbulb" },
+        { title: "Adaptability", description: "Flexibility and quick adjustment to changing project requirements, technologies, and team environments.", icon: "fas fa-sliders" },
+        { title: "Continuous Growth", description: "Open to feedback and continuous skill enhancement through dedicated practice and learning.", icon: "fas fa-chart-line" },
+        { title: "Collaboration", description: "Working together towards shared goals while respecting and leveraging diverse perspectives.", icon: "fas fa-handshake" }
+      ];
+      for (const sf of defaultSoft) {
+        await pool.query(
+          "INSERT INTO soft_skills (title, description, icon) VALUES ($1, $2, $3)",
+          [sf.title, sf.description, sf.icon]
         );
       }
     }
@@ -527,20 +900,65 @@ app.get('/api/bio', async (req, res) => {
 });
 
 app.put('/api/admin/bio', authenticateAdmin, async (req, res) => {
-  const { name, title, description, avatar_url, about_image_url, cv_url } = req.body;
+  const {
+    name, title, greeting, roles, description, avatar_url, about_image_url, cv_url,
+    about_subtitle, about_description,
+    stat1_number, stat1_label, stat2_number, stat2_label, stat3_number, stat3_label,
+    social_facebook, social_twitter, social_instagram, social_linkedin, social_github,
+    contact_email, contact_phone, contact_location, footer_text
+  } = req.body;
+
   try {
     // Check if bio row exists
     const check = await pool.query("SELECT id FROM bio LIMIT 1");
     let result;
     if (check.rowCount > 0) {
       result = await pool.query(
-        "UPDATE bio SET name=$1, title=$2, description=$3, avatar_url=$4, about_image_url=$5, cv_url=$6 WHERE id=$7 RETURNING *",
-        [name, title, description, avatar_url, about_image_url, cv_url, check.rows[0].id]
+        `UPDATE bio SET 
+          name=$1, title=$2, greeting=$3, roles=$4, description=$5, 
+          avatar_url=$6, about_image_url=$7, cv_url=$8, 
+          about_subtitle=$9, about_description=$10, 
+          stat1_number=$11, stat1_label=$12, stat2_number=$13, stat2_label=$14, stat3_number=$15, stat3_label=$16, 
+          social_facebook=$17, social_twitter=$18, social_instagram=$19, social_linkedin=$20, social_github=$21, 
+          contact_email=$22, contact_phone=$23, contact_location=$24, footer_text=$25 
+        WHERE id=$26 RETURNING *`,
+        [
+          name, title, greeting || "Hello, It's Me", roles || title, description,
+          avatar_url, about_image_url, cv_url,
+          about_subtitle || title, about_description || description,
+          stat1_number || "3+", stat1_label || "Featured Projects",
+          stat2_number || "100%", stat2_label || "Dedication",
+          stat3_number || "24/7", stat3_label || "Eager to Learn",
+          social_facebook || "", social_twitter || "", social_instagram || "", social_linkedin || "", social_github || "",
+          contact_email || "", contact_phone || "", contact_location || "", footer_text || "Copyright © 2026 by Soe Ye Htut | All Rights Reserved.",
+          check.rows[0].id
+        ]
       );
     } else {
       result = await pool.query(
-        "INSERT INTO bio (name, title, description, avatar_url, about_image_url, cv_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-        [name, title, description, avatar_url, about_image_url, cv_url]
+        `INSERT INTO bio (
+          name, title, greeting, roles, description, avatar_url, about_image_url, cv_url,
+          about_subtitle, about_description,
+          stat1_number, stat1_label, stat2_number, stat2_label, stat3_number, stat3_label,
+          social_facebook, social_twitter, social_instagram, social_linkedin, social_github,
+          contact_email, contact_phone, contact_location, footer_text
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          $9, $10,
+          $11, $12, $13, $14, $15, $16,
+          $17, $18, $19, $20, $21,
+          $22, $23, $24, $25
+        ) RETURNING *`,
+        [
+          name, title, greeting || "Hello, It's Me", roles || title, description,
+          avatar_url, about_image_url, cv_url,
+          about_subtitle || title, about_description || description,
+          stat1_number || "3+", stat1_label || "Featured Projects",
+          stat2_number || "100%", stat2_label || "Dedication",
+          stat3_number || "24/7", stat3_label || "Eager to Learn",
+          social_facebook || "", social_twitter || "", social_instagram || "", social_linkedin || "", social_github || "",
+          contact_email || "", contact_phone || "", contact_location || "", footer_text || "Copyright © 2026 by Soe Ye Htut | All Rights Reserved."
+        ]
       );
     }
     res.json(result.rows[0]);
@@ -563,10 +981,17 @@ app.put('/api/admin/sections', authenticateAdmin, async (req, res) => {
   const { sections } = req.body;
   try {
     for (const sec of sections) {
-      await pool.query(
-        "UPDATE section_settings SET is_visible=$1 WHERE section_id=$2",
-        [sec.is_visible, sec.section_id]
-      );
+      if (sec.title) {
+        await pool.query(
+          "UPDATE section_settings SET is_visible=$1, title=$2 WHERE section_id=$3",
+          [sec.is_visible, sec.title, sec.section_id]
+        );
+      } else {
+        await pool.query(
+          "UPDATE section_settings SET is_visible=$1 WHERE section_id=$2",
+          [sec.is_visible, sec.section_id]
+        );
+      }
     }
     const result = await pool.query("SELECT * FROM section_settings ORDER BY id ASC");
     res.json(result.rows);
@@ -585,12 +1010,21 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
+function normalizeProjectUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (trimmed === '' || trimmed === '#') return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 app.post('/api/admin/projects', authenticateAdmin, async (req, res) => {
   const { title, description, image_url, project_url, type } = req.body;
+  const safeUrl = normalizeProjectUrl(project_url);
   try {
     const result = await pool.query(
       "INSERT INTO projects (title, description, image_url, project_url, type) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [title, description, image_url, project_url, type]
+      [title, description, image_url, safeUrl, type]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -601,10 +1035,11 @@ app.post('/api/admin/projects', authenticateAdmin, async (req, res) => {
 app.put('/api/admin/projects/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { title, description, image_url, project_url, type } = req.body;
+  const safeUrl = normalizeProjectUrl(project_url);
   try {
     const result = await pool.query(
       "UPDATE projects SET title=$1, description=$2, image_url=$3, project_url=$4, type=$5 WHERE id=$6 RETURNING *",
-      [title, description, image_url, project_url, type, id]
+      [title, description, image_url, safeUrl, type, id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Project not found' });
@@ -716,11 +1151,55 @@ app.delete('/api/admin/messages/:id', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Timeline Chronological Sorting Helper (Oldest -> Newest)
+function parseTimelineYears(timePeriod) {
+  if (!timePeriod) return { start: 9999, end: 9999 };
+  const str = String(timePeriod);
+  const years = str.match(/\b(19\d\d|20\d\d)\b/g);
+  let start = 9999;
+  let end = 9999;
+
+  if (years && years.length > 0) {
+    start = parseInt(years[0], 10);
+    if (years.length > 1) {
+      end = parseInt(years[1], 10);
+    } else if (/present/i.test(str)) {
+      end = 9999;
+    } else {
+      end = start;
+    }
+  } else if (/present/i.test(str)) {
+    start = new Date().getFullYear();
+    end = 9999;
+  }
+
+  return { start, end };
+}
+
+function sortJourneyChronological(items) {
+  if (!Array.isArray(items)) return [];
+  return [...items].sort((a, b) => {
+    const aDates = parseTimelineYears(a.time_period);
+    const bDates = parseTimelineYears(b.time_period);
+
+    // Oldest start year first (e.g. 2021 before 2024, 2026 last)
+    if (aDates.start !== bDates.start) {
+      return aDates.start - bDates.start;
+    }
+    // If same start year, earlier end year first
+    if (aDates.end !== bDates.end) {
+      return aDates.end - bDates.end;
+    }
+    return (a.id || 0) - (b.id || 0);
+  });
+}
+
 // 5.5 Journey (Experience & Education) Endpoints
 app.get('/api/journey', async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM journey ORDER BY id DESC");
-    res.json(result.rows);
+    const result = await pool.query("SELECT * FROM journey");
+    const sorted = sortJourneyChronological(result.rows);
+    res.json(sorted);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -764,6 +1243,165 @@ app.delete('/api/admin/journey/:id', authenticateAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Journey item not found' });
     }
     res.json({ message: 'Journey item deleted successfully', journey: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5.6 Services Endpoints
+app.get('/api/services', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM services ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/services', authenticateAdmin, async (req, res) => {
+  const { title, description, icon } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO services (title, description, icon) VALUES ($1, $2, $3) RETURNING *",
+      [title, description, icon]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/services/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, icon } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE services SET title=$1, description=$2, icon=$3 WHERE id=$4 RETURNING *",
+      [title, description, icon, id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/admin/services/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM services WHERE id=$1 RETURNING *", [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Service not found' });
+    }
+    res.json({ message: 'Service deleted successfully', service: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5.7 Technical Skills Endpoints
+app.get('/api/skills', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM skills ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/skills', authenticateAdmin, async (req, res) => {
+  const { name, percentage, icon, color } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO skills (name, percentage, icon, color) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, parseInt(percentage) || 80, icon, color || '#00f2fe']
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/skills/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { name, percentage, icon, color } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE skills SET name=$1, percentage=$2, icon=$3, color=$4 WHERE id=$5 RETURNING *",
+      [name, parseInt(percentage) || 80, icon, color || '#00f2fe', id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Skill not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/admin/skills/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM skills WHERE id=$1 RETURNING *", [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Skill not found' });
+    }
+    res.json({ message: 'Skill deleted successfully', skill: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5.8 Soft Skills Endpoints
+app.get('/api/soft-skills', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM soft_skills ORDER BY id ASC");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/soft-skills', authenticateAdmin, async (req, res) => {
+  const { title, description, icon } = req.body;
+  try {
+    const result = await pool.query(
+      "INSERT INTO soft_skills (title, description, icon) VALUES ($1, $2, $3) RETURNING *",
+      [title, description, icon]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/admin/soft-skills/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, icon } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE soft_skills SET title=$1, description=$2, icon=$3 WHERE id=$4 RETURNING *",
+      [title, description, icon, id]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Soft skill not found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/admin/soft-skills/:id', authenticateAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM soft_skills WHERE id=$1 RETURNING *", [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Soft skill not found' });
+    }
+    res.json({ message: 'Soft skill deleted successfully', soft_skill: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
