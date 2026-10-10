@@ -639,7 +639,7 @@ async function initDB() {
     const bioColumns = [
       "about_image_url VARCHAR(255)",
       "cv_url VARCHAR(255)",
-      "greeting VARCHAR(100) DEFAULT 'Hello, It\\'s Me'",
+      "greeting VARCHAR(100) DEFAULT 'Hello, It''s Me'",
       "roles VARCHAR(255) DEFAULT 'Frontend Developer'",
       "about_subtitle VARCHAR(150)",
       "about_description TEXT",
