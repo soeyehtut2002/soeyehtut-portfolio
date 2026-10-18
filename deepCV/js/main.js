@@ -448,6 +448,115 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function formatJourneyItem(item) {
+    let rawTitle = (item.title || '').trim();
+    let institution = (item.institution || '').trim();
+    let category = (item.category || '').trim();
+    let icon = (item.icon || '').trim();
+    let role = rawTitle;
+
+    // Intelligent extraction of institution / organization if not explicitly supplied
+    if (!institution) {
+      if (rawTitle.includes(' - ')) {
+        const parts = rawTitle.split(' - ');
+        role = parts[0].trim();
+        institution = parts.slice(1).join(' - ').trim();
+      } else if (rawTitle.includes(' at ')) {
+        const parts = rawTitle.split(' at ');
+        role = parts[0].trim();
+        institution = parts.slice(1).join(' at ').trim();
+      } else if (rawTitle.includes(' | ')) {
+        const parts = rawTitle.split(' | ');
+        role = parts[0].trim();
+        institution = parts.slice(1).join(' | ').trim();
+      } else if (/University of Roehampton/i.test(rawTitle)) {
+        institution = 'University of Roehampton';
+      } else if (/Higher Diploma In Software Engineering/i.test(rawTitle)) {
+        institution = 'Higher Diploma In Software Engineering';
+        role = 'Applied Software Engineering Diploma';
+      } else if (/Lithan/i.test(rawTitle)) {
+        institution = 'Lithan Academy / EduCLaaS';
+      } else if (/IT4Kids/i.test(rawTitle)) {
+        institution = 'IT4Kids Academy';
+      }
+    }
+
+    // Fallback if institution and role are identical
+    if (institution && role.toLowerCase() === institution.toLowerCase()) {
+      if (/Diploma/i.test(role)) {
+        role = 'Applied Software Engineering Diploma';
+      } else {
+        role = 'Academic & Professional Program';
+      }
+    }
+
+    // Auto-detect category
+    if (!category) {
+      const combined = (role + ' ' + institution).toLowerCase();
+      if (combined.includes('university') || combined.includes('degree') || combined.includes('bachelor') || combined.includes('b.s.') || combined.includes('roehampton')) {
+        category = 'Higher Education';
+      } else if (combined.includes('diploma') || combined.includes('academy') || combined.includes('training')) {
+        category = 'Specialized Diploma';
+      } else if (combined.includes('teacher') || combined.includes('instructor') || combined.includes('it4kids') || combined.includes('mentor')) {
+        category = 'Mentorship';
+      } else if (combined.includes('freelance')) {
+        category = 'Freelance';
+      } else {
+        category = 'Experience';
+      }
+    }
+
+    // Auto-detect icon
+    if (!icon) {
+      const combined = (role + ' ' + institution + ' ' + category).toLowerCase();
+      if (combined.includes('university') || combined.includes('roehampton') || combined.includes('college')) {
+        icon = 'fas fa-university';
+      } else if (combined.includes('diploma') || combined.includes('degree') || combined.includes('school') || combined.includes('academy') || combined.includes('education')) {
+        icon = 'fas fa-graduation-cap';
+      } else if (combined.includes('instructor') || combined.includes('teacher') || combined.includes('kids') || combined.includes('mentor')) {
+        icon = 'fas fa-chalkboard-teacher';
+      } else if (combined.includes('freelance') || combined.includes('developer') || combined.includes('software') || combined.includes('engineer') || combined.includes('web')) {
+        icon = 'fas fa-laptop-code';
+      } else if (combined.includes('certificate') || combined.includes('award')) {
+        icon = 'fas fa-award';
+      } else {
+        icon = 'fas fa-building';
+      }
+    }
+
+    return {
+      role: role || rawTitle,
+      institution: institution || '',
+      category,
+      icon,
+      timePeriod: item.time_period || '',
+      description: item.description || ''
+    };
+  }
+
+  function getCategoryIcon(cat) {
+    const c = (cat || '').toLowerCase();
+    if (c.includes('education') || c.includes('university')) return 'fas fa-graduation-cap';
+    if (c.includes('diploma') || c.includes('training')) return 'fas fa-award';
+    if (c.includes('freelance')) return 'fas fa-laptop-code';
+    if (c.includes('mentor') || c.includes('teach')) return 'fas fa-chalkboard-teacher';
+    return 'fas fa-briefcase';
+  }
+
+  function formatTimelineDescription(desc) {
+    if (!desc) return '';
+    const lines = desc.split('\n').map(l => l.trim()).filter(Boolean);
+    const hasBullets = lines.some(l => l.startsWith('•') || l.startsWith('-') || l.startsWith('*'));
+    if (hasBullets) {
+      const lis = lines.map(l => {
+        const text = l.replace(/^[•\-*]\s*/, '');
+        return `<li><span class="bullet-dot"></span><span class="bullet-text">${text}</span></li>`;
+      }).join('');
+      return `<ul class="timeline-bullets">${lis}</ul>`;
+    }
+    return `<p class="timeline-desc-p">${desc}</p>`;
+  }
+
   // 7. Fetch Journey Timeline Items (Chronological: Oldest -> Newest)
   try {
     const res = await fetch('/api/journey');
@@ -457,17 +566,49 @@ document.addEventListener('DOMContentLoaded', () => {
       const timeline = document.getElementById('journey-timeline');
       if (timeline && journeyItems.length > 0) {
         timeline.innerHTML = '';
-        journeyItems.forEach((item, index) => {
+        journeyItems.forEach((rawItem, index) => {
+          const item = formatJourneyItem(rawItem);
           const alignClass = index % 2 === 0 ? 'left' : 'right';
           const container = document.createElement('div');
           container.className = `timeline-container ${alignClass}`;
-          container.style.opacity = '0';
+          
+          const categorySlug = item.category.toLowerCase().replace(/[^a-z0-9]/g, '-');
+          
           container.innerHTML = `
-            <div class="timeline-dot"></div>
+            <div class="timeline-dot">
+              <div class="timeline-dot-inner"></div>
+            </div>
             <div class="timeline-content">
-              ${item.time_period ? `<span class="timeline-date"><i class="fas fa-calendar-alt" style="margin-right: 0.6rem; font-size: 1.1rem;"></i>${item.time_period}</span>` : ''}
-              <h3 style="font-size: 2rem; margin: 0.5rem 0; color: var(--text-color); font-weight: 700;">${item.title}</h3>
-              <p style="font-size: 1.4rem; color: var(--text-muted); margin-top: 0.8rem; line-height: 1.6; white-space: pre-line;">${item.description}</p>
+              <!-- Top Meta Bar: Time Period & Category Tag -->
+              <div class="timeline-meta-bar">
+                ${item.timePeriod ? `<span class="timeline-date"><i class="fas fa-calendar-alt"></i>${item.timePeriod}</span>` : ''}
+                <span class="timeline-category-tag category-${categorySlug}">
+                  <i class="${getCategoryIcon(item.category)}"></i> ${item.category}
+                </span>
+              </div>
+
+              <!-- PROMINENT HIGHLIGHT: Institution / School / Training Center / Company -->
+              ${item.institution ? `
+                <div class="timeline-institution-card">
+                  <div class="timeline-institution-badge">
+                    <div class="timeline-org-icon-wrapper">
+                      <i class="${item.icon}"></i>
+                    </div>
+                    <div class="timeline-org-details">
+                      <span class="timeline-org-label">Institution / Organization</span>
+                      <span class="timeline-org-name">${item.institution}</span>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Degree / Role Title -->
+              <h3 class="timeline-role-title">${item.role}</h3>
+
+              <!-- Description & Key Highlights -->
+              <div class="timeline-body-text">
+                ${formatTimelineDescription(item.description)}
+              </div>
             </div>
           `;
           timeline.appendChild(container);

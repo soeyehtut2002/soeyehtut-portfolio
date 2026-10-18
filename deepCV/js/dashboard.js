@@ -1009,15 +1009,32 @@ document.addEventListener('DOMContentLoaded', () => {
           const card = document.createElement('div');
           card.className = 'card';
           card.style.marginBottom = '1.8rem';
+          const institutionName = j.institution || (j.title.includes(' - ') ? j.title.split(' - ')[1] : (j.title.includes('Roehampton') ? 'University of Roehampton' : ''));
+          const displayTitle = j.title;
+          const categoryName = j.category || 'Experience';
+
           card.innerHTML = `
             <div class="card-body">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.8rem;">
-                <span class="badge" style="margin: 0; font-size: 1.2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
-                  <i class="fas fa-calendar-alt"></i> ${j.time_period || 'Present'}
-                </span>
+                <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap;">
+                  <span class="badge" style="margin: 0; font-size: 1.2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-calendar-alt"></i> ${j.time_period || 'Present'}
+                  </span>
+                  <span class="badge badge-primary" style="margin: 0; font-size: 1.15rem; background: rgba(0, 242, 254, 0.12); color: var(--main-color); border: 1px solid rgba(0, 242, 254, 0.3);">
+                    ${categoryName}
+                  </span>
+                </div>
                 <span style="font-size: 1.2rem; color: var(--text-muted);">ID: #${j.id}</span>
               </div>
-              <h4 style="font-size: 1.9rem; margin-bottom: 0.8rem; color: var(--text-color);">${j.title}</h4>
+
+              ${institutionName ? `
+                <div style="display: inline-flex; align-items: center; gap: 0.8rem; background: rgba(0, 242, 254, 0.08); border: 1.5px solid rgba(0, 242, 254, 0.3); padding: 0.6rem 1.2rem; border-radius: 8px; margin-bottom: 0.8rem;">
+                  <i class="fas fa-university" style="color: var(--main-color); font-size: 1.4rem;"></i>
+                  <strong style="color: var(--text-color); font-size: 1.5rem; letter-spacing: 0.2px;">${institutionName}</strong>
+                </div>
+              ` : ''}
+
+              <h4 style="font-size: 1.9rem; margin-bottom: 0.8rem; color: var(--text-color);">${displayTitle}</h4>
               <p style="white-space: pre-line; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.4rem;">${j.description || ''}</p>
               <div class="card-actions">
                 <button class="edit-btn" onclick="editJourney(${j.id})"><i class="fas fa-edit"></i> Edit</button>
@@ -1071,30 +1088,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Category Presets Helper
   window.applyJourneyPreset = function (type) {
+    const instEl = document.getElementById('quick-journey-institution');
     const titleEl = document.getElementById('quick-journey-title');
+    const catEl = document.getElementById('quick-journey-category');
     const timeEl = document.getElementById('quick-journey-time');
     const descEl = document.getElementById('quick-journey-desc');
 
-    if (type === 'work') {
-      if (titleEl) titleEl.value = 'Frontend Developer - Tech Company';
-      if (timeEl) timeEl.value = '2026 - Present';
-      if (descEl) descEl.value = '• Developed modern responsive web applications using React and JavaScript.\n• Collaborated with UX designers to craft high-conversion user interfaces.\n• Improved page loading speed and mobile performance.';
-    } else if (type === 'education') {
-      if (titleEl) titleEl.value = 'Bachelor of Computer Science - University';
+    if (type === 'diploma') {
+      if (instEl) instEl.value = 'Higher Diploma In Software Engineering';
+      if (titleEl) titleEl.value = 'Higher Diploma in Software Engineering';
+      if (catEl) catEl.value = 'Specialized Diploma';
+      if (timeEl) timeEl.value = '2021 - 2023';
+      if (descEl) descEl.value = '• Intensive applied diploma in modern software engineering, web architectures, agile development, and enterprise databases.\n• Completed industry-aligned full-stack capstone projects with high distinction.';
+    } else if (type === 'roehampton') {
+      if (instEl) instEl.value = 'University of Roehampton';
+      if (titleEl) titleEl.value = 'B.S. (Hons) in Computer Science';
+      if (catEl) catEl.value = 'Higher Education';
       if (timeEl) timeEl.value = '2023 - 2026';
-      if (descEl) descEl.value = '• Studied software engineering principles, algorithms, and web technologies.\n• Completed capstone web project with honors.\n• Active member of university coding club.';
+      if (descEl) descEl.value = '• In-depth study of algorithms, software design patterns, distributed cloud systems, and responsive full-stack applications.\n• Advanced research and project work focusing on high-performance modern user interfaces.';
+    } else if (type === 'teaching') {
+      if (instEl) instEl.value = 'IT4Kids Academy';
+      if (titleEl) titleEl.value = 'IT Instructor / Coding Teacher';
+      if (catEl) catEl.value = 'Mentorship';
+      if (timeEl) timeEl.value = '2026 - Present';
+      if (descEl) descEl.value = '• Teaching basic programming and computer skills to children, guiding hands-on coding activities.\n• Breaking down complex technical concepts into intuitive, engaging lessons.';
     } else if (type === 'freelance') {
+      if (instEl) instEl.value = 'Independent Developer';
       if (titleEl) titleEl.value = 'Freelance Web Developer';
-      if (timeEl) timeEl.value = '2025 - Present';
-      if (descEl) descEl.value = '• Delivered tailored portfolio and business web applications for local clients.\n• Implemented secure backend APIs, payment integrations, and responsive UI.';
-    } else if (type === 'certificate') {
-      if (titleEl) titleEl.value = 'Full-Stack Web Development Certification';
-      if (timeEl) timeEl.value = '2025';
-      if (descEl) descEl.value = '• Intensive program in HTML5, CSS3, JavaScript ES6+, React, Node.js, and databases.\n• Built and deployed 5+ production-ready web applications.';
+      if (catEl) catEl.value = 'Freelance';
+      if (timeEl) timeEl.value = '2024 - Present';
+      if (descEl) descEl.value = '• Developing tailored frontend web solutions, client landing pages, and interactive web applications.\n• Delivering pixel-perfect, accessible, and responsive user experiences.';
     }
 
-    if (titleEl) titleEl.focus();
-    showToast('Applied ' + type + ' template! You can now adjust details.');
+    if (instEl) instEl.focus();
+    showToast('Applied preset template! You can now adjust details.');
   };
 
   // Clone an existing entry to the Quick Add form
@@ -1105,11 +1132,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = await res.json();
         const j = items.find((item) => item.id === id);
         if (j) {
+          const instEl = document.getElementById('quick-journey-institution');
           const titleEl = document.getElementById('quick-journey-title');
+          const catEl = document.getElementById('quick-journey-category');
           const timeEl = document.getElementById('quick-journey-time');
           const descEl = document.getElementById('quick-journey-desc');
 
-          if (titleEl) titleEl.value = j.title;
+          if (instEl) instEl.value = j.institution || '';
+          if (titleEl) titleEl.value = j.title || '';
+          if (catEl && j.category) catEl.value = j.category;
           if (timeEl) timeEl.value = j.time_period || '';
           if (descEl) descEl.value = j.description || '';
 
@@ -1118,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (quickForm) {
             quickForm.scrollIntoView({ behavior: 'smooth' });
           }
-          if (titleEl) titleEl.focus();
+          if (instEl) instEl.focus();
           showToast('Loaded into Quick Add form as template!');
         }
       }
@@ -1135,7 +1166,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = quickJourneyForm.querySelector('button[type="submit"]');
 
       const payload = {
+        institution: (document.getElementById('quick-journey-institution') ? document.getElementById('quick-journey-institution').value.trim() : ''),
         title: document.getElementById('quick-journey-title').value.trim(),
+        category: (document.getElementById('quick-journey-category') ? document.getElementById('quick-journey-category').value : 'Experience'),
         time_period: document.getElementById('quick-journey-time').value.trim(),
         description: document.getElementById('quick-journey-desc').value.trim()
       };
@@ -1185,7 +1218,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const j = items.find((item) => item.id === id);
       if (j) {
         document.getElementById('journey-id').value = j.id;
-        document.getElementById('journey-title').value = j.title;
+        if (document.getElementById('journey-institution')) {
+          document.getElementById('journey-institution').value = j.institution || '';
+        }
+        document.getElementById('journey-title').value = j.title || '';
+        if (document.getElementById('journey-category') && j.category) {
+          document.getElementById('journey-category').value = j.category;
+        }
         document.getElementById('journey-time').value = j.time_period || '';
         document.getElementById('journey-description').value = j.description || '';
 
@@ -1203,7 +1242,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const submitBtn = journeyForm.querySelector('button[type="submit"]');
 
       const payload = {
+        institution: (document.getElementById('journey-institution') ? document.getElementById('journey-institution').value.trim() : ''),
         title: document.getElementById('journey-title').value.trim(),
+        category: (document.getElementById('journey-category') ? document.getElementById('journey-category').value : 'Experience'),
         time_period: document.getElementById('journey-time').value.trim(),
         description: document.getElementById('journey-description').value.trim()
       };

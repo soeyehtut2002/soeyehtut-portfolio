@@ -119,21 +119,39 @@ const mockDb = {
   journey: [
     {
       id: 1,
-      title: "B.S. in Computer Science",
-      description: "Studied software engineering principles, algorithms, database management systems, and modern web application development.",
-      time_period: "2021 - 2026"
+      title: "Higher Diploma in Software Engineering",
+      institution: "Higher Diploma In Software Engineering",
+      category: "Specialized Diploma",
+      icon: "fas fa-graduation-cap",
+      time_period: "2021 - 2023",
+      description: "• Intensive applied diploma in modern software engineering, web architectures, agile development, and enterprise databases.\n• Completed industry-aligned full-stack capstone projects with high distinction."
     },
     {
       id: 2,
-      title: "Freelance Web Developer",
-      description: "Developing frontend solutions, responsive web interfaces, and single-page apps for local and remote clients.",
-      time_period: "2024 - Present"
+      title: "B.S. (Hons) in Computer Science",
+      institution: "University of Roehampton",
+      category: "Higher Education",
+      icon: "fas fa-university",
+      time_period: "2023 - 2026",
+      description: "• In-depth study of algorithms, software design patterns, distributed cloud systems, and responsive full-stack applications.\n• Advanced research and project work focusing on high-performance modern user interfaces."
     },
     {
       id: 3,
-      title: "IT Instructor / Coding Teacher - IT4Kids",
-      description: "Teach basic programming and computer skills to children, guide coding activities, and explain concepts in an easy-to-understand manner.",
-      time_period: "2026 - Present"
+      title: "Freelance Web Developer",
+      institution: "Independent Developer",
+      category: "Freelance",
+      icon: "fas fa-laptop-code",
+      time_period: "2024 - Present",
+      description: "• Developing tailored frontend web solutions, client landing pages, and interactive web applications.\n• Delivering pixel-perfect, accessible, and responsive user experiences."
+    },
+    {
+      id: 4,
+      title: "IT Instructor / Coding Teacher",
+      institution: "IT4Kids Academy",
+      category: "Mentorship",
+      icon: "fas fa-chalkboard-teacher",
+      time_period: "2026 - Present",
+      description: "• Teaching basic programming and computer skills to children, guiding hands-on coding activities.\n• Breaking down complex technical concepts into intuitive, engaging lessons."
     }
   ],
   services: [
@@ -296,7 +314,16 @@ const mockPool = {
         mockDb.section_settings.push(newRow);
       }
       else if (q.includes("insert into journey")) {
-        newRow = { id: mockIdCounter, title: params[0], description: params[1], time_period: params[2], created_at: new Date() };
+        newRow = {
+          id: mockIdCounter,
+          title: params[0],
+          description: params[1],
+          time_period: params[2],
+          institution: params[3] || null,
+          category: params[4] || null,
+          icon: params[5] || null,
+          created_at: new Date()
+        };
         mockDb.journey.push(newRow);
       }
       else if (q.includes("insert into services")) {
@@ -385,11 +412,17 @@ const mockPool = {
         return { rows: [row], rowCount: row ? 1 : 0 };
       }
       if (q.includes("update journey")) {
-        const row = mockDb.journey.find(j => j.id === Number(params[3]));
+        const rowId = Number(params[params.length - 1]);
+        const row = mockDb.journey.find(j => j.id === rowId);
         if (row) {
           row.title = params[0];
           row.description = params[1];
           row.time_period = params[2];
+          if (params.length >= 7) {
+            row.institution = params[3] || null;
+            row.category = params[4] || null;
+            row.icon = params[5] || null;
+          }
         }
         return { rows: [row], rowCount: row ? 1 : 0 };
       }
@@ -662,6 +695,15 @@ async function initDB() {
     for (const col of bioColumns) {
       await pool.query(`ALTER TABLE bio ADD COLUMN IF NOT EXISTS ${col}`);
     }
+
+    const journeyColumns = [
+      "institution VARCHAR(255)",
+      "category VARCHAR(100)",
+      "icon VARCHAR(100)"
+    ];
+    for (const col of journeyColumns) {
+      await pool.query(`ALTER TABLE journey ADD COLUMN IF NOT EXISTS ${col}`);
+    }
     console.log("Tables created or checked successfully.");
 
     // Seed Bio if empty
@@ -790,25 +832,42 @@ async function initDB() {
       console.log("Seeding default journey items...");
       const defaultJourney = [
         {
-          title: "B.S. in Computer Science",
-          description: "Studied software engineering principles, algorithms, database management systems, and modern web application development.",
-          time_period: "2021 - 2026"
+          title: "Higher Diploma in Software Engineering",
+          institution: "Higher Diploma In Software Engineering",
+          category: "Specialized Diploma",
+          icon: "fas fa-graduation-cap",
+          time_period: "2021 - 2023",
+          description: "• Intensive applied diploma in modern software engineering, web architectures, agile development, and enterprise databases.\n• Completed industry-aligned full-stack capstone projects with high distinction."
+        },
+        {
+          title: "B.S. (Hons) in Computer Science",
+          institution: "University of Roehampton",
+          category: "Higher Education",
+          icon: "fas fa-university",
+          time_period: "2023 - 2026",
+          description: "• In-depth study of algorithms, software design patterns, distributed cloud systems, and responsive full-stack applications.\n• Advanced research and project work focusing on high-performance modern user interfaces."
         },
         {
           title: "Freelance Web Developer",
-          description: "Developing frontend solutions, responsive web interfaces, and single-page apps for local and remote clients.",
-          time_period: "2024 - Present"
+          institution: "Independent Developer",
+          category: "Freelance",
+          icon: "fas fa-laptop-code",
+          time_period: "2024 - Present",
+          description: "• Developing tailored frontend web solutions, client landing pages, and interactive web applications.\n• Delivering pixel-perfect, accessible, and responsive user experiences."
         },
         {
-          title: "IT Instructor / Coding Teacher - IT4Kids",
-          description: "Teach basic programming and computer skills to children, guide coding activities, and explain concepts in an easy-to-understand manner.",
-          time_period: "2026 - Present"
+          title: "IT Instructor / Coding Teacher",
+          institution: "IT4Kids Academy",
+          category: "Mentorship",
+          icon: "fas fa-chalkboard-teacher",
+          time_period: "2026 - Present",
+          description: "• Teaching basic programming and computer skills to children, guiding hands-on coding activities.\n• Breaking down complex technical concepts into intuitive, engaging lessons."
         }
       ];
       for (const item of defaultJourney) {
         await pool.query(
-          "INSERT INTO journey (title, description, time_period) VALUES ($1, $2, $3)",
-          [item.title, item.description, item.time_period]
+          "INSERT INTO journey (title, description, time_period, institution, category, icon) VALUES ($1, $2, $3, $4, $5, $6)",
+          [item.title, item.description, item.time_period, item.institution, item.category, item.icon]
         );
       }
     }
@@ -1206,11 +1265,11 @@ app.get('/api/journey', async (req, res) => {
 });
 
 app.post('/api/admin/journey', authenticateAdmin, async (req, res) => {
-  const { title, description, time_period } = req.body;
+  const { title, description, time_period, institution, category, icon } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO journey (title, description, time_period) VALUES ($1, $2, $3) RETURNING *",
-      [title, description, time_period]
+      "INSERT INTO journey (title, description, time_period, institution, category, icon) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [title, description, time_period, institution || null, category || null, icon || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -1220,11 +1279,11 @@ app.post('/api/admin/journey', authenticateAdmin, async (req, res) => {
 
 app.put('/api/admin/journey/:id', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
-  const { title, description, time_period } = req.body;
+  const { title, description, time_period, institution, category, icon } = req.body;
   try {
     const result = await pool.query(
-      "UPDATE journey SET title=$1, description=$2, time_period=$3 WHERE id=$4 RETURNING *",
-      [title, description, time_period, id]
+      "UPDATE journey SET title=$1, description=$2, time_period=$3, institution=$4, category=$5, icon=$6 WHERE id=$7 RETURNING *",
+      [title, description, time_period, institution || null, category || null, icon || null, id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Journey item not found' });

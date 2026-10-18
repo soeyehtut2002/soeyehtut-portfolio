@@ -306,41 +306,56 @@
                 <h4 style="margin: 0; font-size: 1.8rem; color: var(--main-color);"><i class="fas fa-bolt"></i> Quick Add Timeline Entry</h4>
                 <!-- Quick Category Presets -->
                 <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('work')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-briefcase"></i> Work / Job</button>
-                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('education')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-graduation-cap"></i> Education</button>
+                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('diploma')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-graduation-cap"></i> Higher Diploma</button>
+                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('roehampton')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-university"></i> Roehampton Uni</button>
+                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('teaching')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-chalkboard-teacher"></i> IT4Kids</button>
                   <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('freelance')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-laptop-code"></i> Freelance</button>
-                  <button type="button" class="btn btn-secondary quick-preset-btn" onclick="applyJourneyPreset('certificate')" style="padding: 0.5rem 1.2rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-full);"><i class="fas fa-award"></i> Certificate</button>
                 </div>
               </div>
 
               <form id="quick-journey-form">
-                <div class="form-group">
-                  <label for="quick-journey-title"><i class="fas fa-heading"></i> Role / Degree & Organization</label>
-                  <input type="text" id="quick-journey-title" placeholder="e.g. Frontend Developer - ABC Tech or B.S. in Computer Science" required />
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                  <div class="form-group">
+                    <label for="quick-journey-institution"><i class="fas fa-building"></i> School / Training Institute / Company</label>
+                    <input type="text" id="quick-journey-institution" placeholder="e.g. University of Roehampton or Lithan Academy" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="quick-journey-title"><i class="fas fa-heading"></i> Role / Degree / Qualification</label>
+                    <input type="text" id="quick-journey-title" placeholder="e.g. Higher Diploma In Software Engineering or B.S. in Computer Science" required />
+                  </div>
                 </div>
 
-                <div class="form-group">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
-                    <label for="quick-journey-time" style="margin-bottom: 0;"><i class="fas fa-calendar-alt"></i> Time Period</label>
-                    <!-- Quick Date Chips -->
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-                      <span style="font-size: 1.2rem; color: var(--text-muted);">Quick pick:</span>
-                      <button type="button" class="date-chip" onclick="setQuickDate('2026 - Present')">2026 - Present</button>
-                      <button type="button" class="date-chip" onclick="setQuickDate('2025 - Present')">2025 - Present</button>
-                      <button type="button" class="date-chip" onclick="setQuickDate('2024 - 2026')">2024 - 2026</button>
-                      <button type="button" class="date-chip" onclick="setQuickDate('2023 - 2024')">2023 - 2024</button>
-                      <button type="button" class="date-chip" onclick="setQuickDate('Present')">Present</button>
-                    </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                  <div class="form-group">
+                    <label for="quick-journey-category"><i class="fas fa-tag"></i> Category / Type</label>
+                    <select id="quick-journey-category" style="width: 100%; padding: 1.2rem 1.6rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); color: var(--text-color); font-size: 1.4rem;">
+                      <option value="Higher Education">Higher Education (University)</option>
+                      <option value="Specialized Diploma">Specialized Diploma / Training</option>
+                      <option value="Experience">Professional Experience</option>
+                      <option value="Freelance">Freelance & Contract</option>
+                      <option value="Mentorship">Teaching & Mentorship</option>
+                      <option value="Certificate">Certification</option>
+                    </select>
                   </div>
-                  <input type="text" id="quick-journey-time" placeholder="e.g. 2024 - Present or 2023 - 2025" required />
+                  <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                      <label for="quick-journey-time" style="margin-bottom: 0;"><i class="fas fa-calendar-alt"></i> Time Period</label>
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center;">
+                        <button type="button" class="date-chip" onclick="setQuickDate('2026 - Present')">2026 - Present</button>
+                        <button type="button" class="date-chip" onclick="setQuickDate('2023 - 2026')">2023 - 2026</button>
+                        <button type="button" class="date-chip" onclick="setQuickDate('2021 - 2023')">2021 - 2023</button>
+                      </div>
+                    </div>
+                    <input type="text" id="quick-journey-time" placeholder="e.g. 2023 - 2026 or 2024 - Present" required />
+                  </div>
                 </div>
 
                 <div class="form-group">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                    <label for="quick-journey-desc" style="margin-bottom: 0;"><i class="fas fa-align-left"></i> Description & Responsibilities</label>
+                    <label for="quick-journey-desc" style="margin-bottom: 0;"><i class="fas fa-align-left"></i> Description & Key Highlights</label>
                     <button type="button" class="btn btn-secondary" onclick="addBulletPoint('quick-journey-desc')" style="padding: 0.3rem 1rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-sm);"><i class="fas fa-list-ul"></i> Add Bullet (•)</button>
                   </div>
-                  <textarea id="quick-journey-desc" rows="3" placeholder="Describe your responsibilities, tasks, or courses (supports multiple lines & bullet points)" required></textarea>
+                  <textarea id="quick-journey-desc" rows="3" placeholder="Describe achievements, curriculum, or responsibilities (supports bullet points •)" required></textarea>
                 </div>
 
                 <button type="submit" class="btn" style="width: 100%;"><i class="fas fa-plus-circle"></i> Add To Timeline Now</button>
@@ -576,31 +591,49 @@
         <form id="journey-form">
           <input type="hidden" id="journey-id" />
 
-          <div class="form-group">
-            <label for="journey-title"><i class="fas fa-heading"></i> Title / Role & Organization</label>
-            <input type="text" id="journey-title" placeholder="e.g. Freelance Developer / Computer Science Degree" required />
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-group">
+              <label for="journey-institution"><i class="fas fa-building"></i> School / Training Institute / Company</label>
+              <input type="text" id="journey-institution" placeholder="e.g. University of Roehampton or Lithan Academy" required />
+            </div>
+            <div class="form-group">
+              <label for="journey-title"><i class="fas fa-heading"></i> Role / Qualification / Degree</label>
+              <input type="text" id="journey-title" placeholder="e.g. Higher Diploma In Software Engineering or B.S. in Computer Science" required />
+            </div>
           </div>
 
-          <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
-              <label for="journey-time" style="margin-bottom: 0;"><i class="fas fa-calendar-alt"></i> Time Period</label>
-              <!-- Quick Date Chips inside Modal -->
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button type="button" class="date-chip" onclick="setModalDate('2026 - Present')">2026 - Present</button>
-                <button type="button" class="date-chip" onclick="setModalDate('2025 - Present')">2025 - Present</button>
-                <button type="button" class="date-chip" onclick="setModalDate('2024 - 2026')">2024 - 2026</button>
-                <button type="button" class="date-chip" onclick="setModalDate('Present')">Present</button>
-              </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-group">
+              <label for="journey-category"><i class="fas fa-tag"></i> Category / Type</label>
+              <select id="journey-category" style="width: 100%; padding: 1.2rem 1.6rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-md); color: var(--text-color); font-size: 1.4rem;">
+                <option value="Higher Education">Higher Education (University)</option>
+                <option value="Specialized Diploma">Specialized Diploma / Training</option>
+                <option value="Experience">Professional Experience</option>
+                <option value="Freelance">Freelance & Contract</option>
+                <option value="Mentorship">Teaching & Mentorship</option>
+                <option value="Certificate">Certification</option>
+              </select>
             </div>
-            <input type="text" id="journey-time" placeholder="e.g. 2024 - Present" required />
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+                <label for="journey-time" style="margin-bottom: 0;"><i class="fas fa-calendar-alt"></i> Time Period</label>
+                <!-- Quick Date Chips inside Modal -->
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="date-chip" onclick="setModalDate('2026 - Present')">2026 - Present</button>
+                  <button type="button" class="date-chip" onclick="setModalDate('2023 - 2026')">2023 - 2026</button>
+                  <button type="button" class="date-chip" onclick="setModalDate('2021 - 2023')">2021 - 2023</button>
+                </div>
+              </div>
+              <input type="text" id="journey-time" placeholder="e.g. 2023 - 2026 or 2024 - Present" required />
+            </div>
           </div>
 
           <div class="form-group">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-              <label for="journey-description" style="margin-bottom: 0;"><i class="fas fa-align-left"></i> Description</label>
+              <label for="journey-description" style="margin-bottom: 0;"><i class="fas fa-align-left"></i> Description & Key Highlights</label>
               <button type="button" class="btn btn-secondary" onclick="addBulletPoint('journey-description')" style="padding: 0.3rem 1rem; font-size: 1.2rem; width: auto; border-radius: var(--radius-sm);"><i class="fas fa-list-ul"></i> Add Bullet (•)</button>
             </div>
-            <textarea id="journey-description" rows="4" placeholder="Describe your achievements, tasks, or courses" required></textarea>
+            <textarea id="journey-description" rows="4" placeholder="Describe achievements, curriculum, or responsibilities" required></textarea>
           </div>
 
           <button type="submit" class="btn" style="width: 100%;">Save Journey Entry</button>
